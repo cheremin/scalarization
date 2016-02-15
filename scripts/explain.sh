@@ -8,6 +8,6 @@ echo "Use +EA:"
 #-XX:+PrintInlining -XX:CompileCommand="print ru/cheremin/scalarization/scenarios/$SCENARIO allocate"
 $JAVA_CMD \
 	-XX:+UnlockDiagnosticVMOptions -XX:+DoEscapeAnalysis -XX:BCEATraceLevel=3 \
-	-XX:+PrintEscapeAnalysis -XX:+Verbose
+	-XX:+PrintEscapeAnalysis -XX:+Verbose \
 	-Dscenario=scenarios.$SCENARIO -Dscenario.size=$SIZE \
 	ru.cheremin.scalarization.AllocationBenchmark
