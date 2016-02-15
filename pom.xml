@@ -138,11 +138,11 @@
             <version>3.4.0</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.affinity</groupId>
             <artifactId>affinity</artifactId>
             <version>0.1.1-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 
