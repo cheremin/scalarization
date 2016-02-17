@@ -16,7 +16,7 @@ public class AllocationBenchmark {
 	private static final String SCENARIO_CLASS_NAME = System.getProperty( "scenario" );
 
 	private static final int ITERATIONS_IN_BATCH = Integer.getInteger( "iterations-in-batch", 1024 );
-	private static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 1000 );
+	private static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 3000 );
 	private static final int RUNS = 12;
 
 	/**
