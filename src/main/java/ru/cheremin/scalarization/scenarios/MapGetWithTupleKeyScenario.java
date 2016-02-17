@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * With ImmutableMap.get() keys are scalarized under 1.7 only with InlineSmallCode=2000,
  * with 1000 (default) keys are not scalarized ("already compiled into a big method")
  * Under 1.8 it is scalarized with default settings (.get() method is listed as
- * inlined), even with InlineSmallCode=1000 it still inlines, and scanarization still
+ * inlined), even with InlineSmallCode=1000 it still inlines, and scalarization still
  * do happen.
  *
  * With HashMap.get() keys are scalarized under 1.8 with default settings, and are not
