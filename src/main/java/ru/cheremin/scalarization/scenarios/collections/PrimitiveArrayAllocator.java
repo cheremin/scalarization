@@ -1,13 +1,17 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.collections;
+
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
  * Both 1.8.0_73 and 1.7.0_25 JVMs:
- *
+ * <p/>
  * With explicit cell access, like array[4], array is scalarized if length <= 64
  * With vectorized (looping) access array is not scalarized with length >1 (and is
  * scalarized for length = 1).
  * Manual loop unrolling with switch still allow to scalarize array
  *
+ *
+ * TODO RC: random index array access
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
@@ -16,23 +20,41 @@ public class PrimitiveArrayAllocator extends AllocationScenario {
 
 	@Override
 	public long allocate() {
-		final byte[] array = new byte[SIZE];
-		fill( array, ( byte ) 42 );
+		final int[] array = new int[SIZE];
 
+		fill( array, ( int ) 42 );
 
 		return sum( array );
 	}
 
-	private static long sum( final byte[] array ) {
+	private static long sum( final int[] array ) {
 		long sum = 0;
 		if( VECTORIZED ) {
-			for( final byte b : array ) {
+			for( final int b : array ) {
 				sum += b;
 			}
 		} else {
 			//manual loop unrolling
 			switch( array.length ) {
 				default:
+				case 16:
+					sum += array[15];
+				case 15:
+					sum += array[14];
+				case 14:
+					sum += array[13];
+				case 13:
+					sum += array[12];
+				case 12:
+					sum += array[11];
+				case 11:
+					sum += array[10];
+				case 10:
+					sum += array[9];
+				case 9:
+					sum += array[8];
+				case 8:
+					sum += array[7];
 				case 7:
 					sum += array[6];
 				case 6:
@@ -54,17 +76,34 @@ public class PrimitiveArrayAllocator extends AllocationScenario {
 		return sum;
 	}
 
-	private static void fill( final byte[] array,
-	                          final byte value ) {
+	private static void fill( final int[] array,
+	                          final int value ) {
 		if( VECTORIZED ) {
 			for( int i = 0; i < array.length; i++ ) {
 				array[i] = value;
 			}
 		} else {
 			//manual loop unrolling
-
 			switch( array.length ) {
 				default:
+				case 16:
+					array[15] = value;
+				case 15:
+					array[14] = value;
+				case 14:
+					array[13] = value;
+				case 13:
+					array[12] = value;
+				case 12:
+					array[11] = value;
+				case 11:
+					array[10] = value;
+				case 10:
+					array[9] = value;
+				case 9:
+					array[8] = value;
+				case 8:
+					array[7] = value;
 				case 7:
 					array[6] = value;
 				case 6:

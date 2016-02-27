@@ -1,4 +1,7 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.collections;
+
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.scenarios.Utils;
 
 /**
 

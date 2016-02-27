@@ -1,13 +1,16 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.tricky;
+
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
  * 1.8.0_73:
  * new Object().hashCode() -> is not scalarized
- * new WithCustomHashCode() -> is scalarized
- * new WithoutCustomHashCode() -> is not scalarized
- * System.identityHashCode( new WithCustomHashCode(..) ) -> not scalarized
+ * new WithCustomHashCode().hashCode() -> is scalarized
+ * new WithoutCustomHashCode().hashCode() -> is NOT scalarized
+ * System.identityHashCode( new WithCustomHashCode(..) ) -> NOT scalarized
  * new WithCustomHashCode() == new WithCustomHashCode() -> scalarized
  * WithoutCustomHashCode.equals(WithoutCustomHashCode) -> scalarized
+ * WithoutCustomHashCode.getClass() == WithoutCustomHashCode.getClass() -> scalarized
  *
  * I.e. it is only system identity hash code which blocks scalarization (most probably
  * because it is native function which is not inlined, and not explicitly marked
@@ -23,7 +26,7 @@ public class ObjectyStaffScenario extends AllocationScenario {
 	public long allocate() {
 		final WithoutCustomHashCode o1 = new WithoutCustomHashCode( 1, 4 );
 		final WithoutCustomHashCode o2 = new WithoutCustomHashCode( 1, 4 );
-		return o1.equals( o2 ) ? 1 : 5;
+		return o1.getClass() ==  o2.getClass() ? 1 : 5;
 	}
 
 	public static final class WithCustomHashCode {

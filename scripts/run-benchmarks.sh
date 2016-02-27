@@ -11,8 +11,8 @@ JAVA_CMD="$JAVA_HOME/bin/java -cp ../target/benchmarks.jar $JAVA_OPTS -Dscenario
 
 echo "Use +EA:"
 
-$JAVA_CMD -XX:+DoEscapeAnalysis ru.cheremin.scalarization.AllocationBenchmark
+$JAVA_CMD -XX:+DoEscapeAnalysis ru.cheremin.scalarization.infra.AllocationBenchmarkMain
 
 echo "Use -EA:"
 
-$JAVA_CMD -XX:-DoEscapeAnalysis ru.cheremin.scalarization.AllocationBenchmark
+$JAVA_CMD -XX:-DoEscapeAnalysis ru.cheremin.scalarization.infra.AllocationBenchmarkMain

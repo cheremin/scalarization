@@ -1,7 +1,9 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.collections;
 
 
 import java.util.*;
+
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
  * @author ruslan

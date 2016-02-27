@@ -1,4 +1,8 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.plain;
+
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.scenarios.MapGetWithTupleKeyScenario;
+import ru.cheremin.scalarization.scenarios.Utils;
 
 /**
  * String2Key allocations is most likely eliminated successfully. {@linkplain #getHashCode(String2Key)}

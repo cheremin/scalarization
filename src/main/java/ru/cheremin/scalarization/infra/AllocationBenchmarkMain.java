@@ -1,4 +1,4 @@
-package ru.cheremin.scalarization;
+package ru.cheremin.scalarization.infra;
 
 import java.lang.management.ManagementFactory;
 
@@ -8,16 +8,21 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 
 /**
+ * No args, "scenario" class passed with system property (the only required, others
+ * optional with reasonable defaults).
+ * <p/>
+ * Usually called from {@linkplain ru.cheremin.scalarization.ForkingMain}
+ *
  * @author ruslan
  *         created 13.11.12 at 22:42
  */
-public class AllocationBenchmark {
+public class AllocationBenchmarkMain {
 
-	private static final String SCENARIO_CLASS_NAME = System.getProperty( "scenario" );
+	public static final String SCENARIO_CLASS_NAME = System.getProperty( "scenario" );
 
-	private static final int ITERATIONS_IN_BATCH = Integer.getInteger( "iterations-in-batch", 1024 );
-	private static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 3000 );
-	private static final int RUNS = 12;
+	public static final int ITERATIONS_IN_BATCH = Integer.getInteger( "iterations-in-batch", 1024 );
+	public static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 3000 );
+	public static final int RUNS = Integer.getInteger( "runs", 12 );
 
 	/**
 	 * Bytes allocated in {@linkplain ThreadMXBean#getThreadAllocatedBytes(long)}for
@@ -27,9 +32,19 @@ public class AllocationBenchmark {
 
 
 	public static void main( final String[] args ) throws Exception {
-		final Class<?> clazz = Class.forName( AllocationBenchmark.class.getPackage().getName() + '.' + SCENARIO_CLASS_NAME );
+		final Class<?> clazz = Class.forName( AllocationBenchmarkMain.class.getPackage().getName() + '.' + SCENARIO_CLASS_NAME );
 		final AllocationScenario scenario = ( AllocationScenario ) clazz.newInstance();
 
+		System.out.println( "\n=======================================================" );
+		System.out.printf(
+				"JDK: %s, JVM: %s\nOS: '%s' %s arch: %s\n",
+				System.getProperty( "java.version" ),
+				System.getProperty( "java.vm.version" ),
+
+				System.getProperty( "os.name" ),
+				System.getProperty( "os.version" ),
+				System.getProperty( "os.arch" )
+		);
 		System.out.printf(
 				"%s: %d runs, %d ms each\n",
 				scenario,
@@ -55,6 +70,7 @@ public class AllocationBenchmark {
 
 		//print results
 		printResults( benchmarkResults );
+		System.out.println( "\n=======================================================" );
 	}
 
 	private static void runBenchmark( final AllocationScenario scenario,

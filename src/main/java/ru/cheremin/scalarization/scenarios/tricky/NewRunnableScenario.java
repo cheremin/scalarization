@@ -1,20 +1,32 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.tricky;
 
 import java.util.concurrent.Callable;
 
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
+
+import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
+
 /**
+ * In original paper (Choi99) there was a simplification which conservatively assumes
+ * any Runnable instance as escaping. I've checked, and currently this is not true:
+ * Runnable/Callable instances are scalarized as an ordinary objects.
+ *
  * @author ruslan
  *         created 10/02/16 at 15:11
  */
 public class NewRunnableScenario extends AllocationScenario {
-	private final String[] names = Utils.generateStringArray( SIZE );
+	private final StringKeysGenerator generator = randomKeysGenerator( SIZE );
 
 	@Override
 	public long allocate() {
-		final ImplementsCallable object = new ImplementsCallable( nextName() );
-		object.call();
+		final ImplementsRunnable object = new ImplementsRunnable(
+				generator.next()
+		);
+		object.run();
 		return object.name.length();
 	}
+
 
 	public static class ImplementsRunnable implements Runnable {
 		public final String name;
@@ -29,13 +41,6 @@ public class NewRunnableScenario extends AllocationScenario {
 		}
 	}
 
-	private int index = 0;
-
-	public String nextName() {
-		index = ( index + 1 ) % names.length;
-		return names[index];
-	}
-
 	public static class ImplementsCallable implements Callable<String> {
 		public final String name;
 
@@ -46,20 +51,6 @@ public class NewRunnableScenario extends AllocationScenario {
 		@Override
 		public String call() {
 			return null;
-		}
-	}
-
-	public static class OverridesFinalize {
-		public final String name;
-
-		public OverridesFinalize( final String name ) {
-			this.name = name;
-		}
-
-		@Override
-		protected void finalize() throws Throwable {
-			super.finalize();
-			//do nothing
 		}
 	}
 }

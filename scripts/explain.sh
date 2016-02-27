@@ -14,4 +14,4 @@ echo "Explaining $SCENARIO:"
 
 $JAVA_CMD \
 	-Dscenario=scenarios.$SCENARIO -Dscenario.size=$SIZE \
-	ru.cheremin.scalarization.AllocationBenchmark
+	ru.cheremin.scalarization.infra.AllocationBenchmarkMain
