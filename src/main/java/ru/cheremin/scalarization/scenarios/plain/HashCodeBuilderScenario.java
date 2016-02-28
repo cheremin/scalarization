@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import ru.cheremin.scalarization.ForkingMain.ScenarioRun;
-import ru.cheremin.scalarization.infra.JvmArg.SystemProperty;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
@@ -29,19 +28,19 @@ public class HashCodeBuilderScenario extends AllocationScenario {
 				.append( true )
 				.append( 'A' )
 				.append( "Abc" )
+				.append( 1.45f )
 				.toHashCode();
 	}
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return Arrays.asList(
-				new ScenarioRun( new SystemProperty( "scenario.size", "0" ) ),
-				new ScenarioRun( new SystemProperty( "scenario.size", "1" ) ),
-				new ScenarioRun( new SystemProperty( "scenario.size", "2" ) ),
-				new ScenarioRun( new SystemProperty( "scenario.size", "4" ) ),
-				new ScenarioRun( new SystemProperty( "scenario.size", "8" ) ),
-				new ScenarioRun( new SystemProperty( "scenario.size", "16" ) ),
-				new ScenarioRun( new SystemProperty( "scenario.size", "32" ) )
+				runWith( "scenario.size", "0" ),
+				runWith( "scenario.size", "1" ),
+				runWith( "scenario.size", "2" ),
+				runWith( "scenario.size", "4" ),
+				runWith( "scenario.size", "16" ),
+				runWith( "scenario.size", "128" )
 		);
 	}
 

@@ -34,10 +34,11 @@ public class ForkingMain {
 	private static final ScenarioRun[] STATIC_RUN_ARGS = {
 			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", true ) ),
 			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", false ) )
+			//TODO: add -server/-client
 	};
 
 	public static void main( final String[] args ) throws Exception {
-		final Class<?> clazz = Class.forName( AllocationBenchmarkMain.class.getPackage().getName() + '.' + SCENARIO_CLASS_NAME );
+		final Class<?> clazz = Class.forName( SCENARIO_CLASS_NAME );
 
 		final List<ScenarioRun> scenarioRuns = extractScenarioSpecificArgs( clazz );
 
@@ -52,6 +53,10 @@ public class ForkingMain {
 			System.out.println( "Find @ScenarioRunArgs(" + scenarioRuns.size() + " runs) -> iterating" );
 		}
 
+		//TODO RC: make JvmProcessBuilder()
+
+		//TODO RC: move STATIC_RUN_ARGS iteration inside per-scenario params iteration
+		// 'cos it's more convenient to have +EA/-EA for same params close to each other
 		for( final ScenarioRun staticRun : STATIC_RUN_ARGS ) {
 			final List<JvmArg> jvmArgs = appendArgsOverriding(
 					systemPropertiesJvmArgs,
@@ -120,25 +125,25 @@ public class ForkingMain {
 
 		final List<JvmArg> jvmArgs = parseJvmArgs( runtimeMXBean );
 
-		appendArgsOverriding( jvmArgs, jvmArgsToOverride );
+		final List<JvmArg> runWithArgs = appendArgsOverriding( jvmArgs, jvmArgsToOverride );
 
 
 		final String jvmPath = Utils.getCurrentJvm();
-		//TODO: add -server/-client
-		//TODO: add +/- DoEscapeAnalysis
 
 		final ImmutableList.Builder<String> jvmCmdLineBuilder = ImmutableList.<String>builder()
 				.add( jvmPath )
 				.add( "-cp" )
 				.add( classPath );
 
-		for( final JvmArg jvmArg : jvmArgs ) {
+		for( final JvmArg jvmArg : runWithArgs ) {
 			jvmCmdLineBuilder.add( jvmArg.asCommandLineString() );
 		}
 
-		return jvmCmdLineBuilder
+		final ImmutableList<String> jvmCommandLine = jvmCmdLineBuilder
 				.add( AllocationBenchmarkMain.class.getName() )
 				.build();
+		System.out.println( jvmCommandLine );
+		return jvmCommandLine;
 	}
 
 	private static List<JvmArg> convertSystemProperties( final Properties systemProperties ) {
@@ -156,9 +161,9 @@ public class ForkingMain {
 			final List<JvmArg> argsToAppend ) {
 		final ArrayList<JvmArg> modifiableArgsList = Lists.newArrayList( sourceArgs );
 
-		for( final JvmArg argToOverride : argsToAppend ) {
-			final String argName = argToOverride.name();
-			final JvmArg.Kind argKind = argToOverride.kind();
+		for( final JvmArg argToAppend : argsToAppend ) {
+			final String argName = argToAppend.name();
+			final JvmArg.Kind argKind = argToAppend.kind();
 
 			for( final Iterator<JvmArg> i = modifiableArgsList.iterator(); i.hasNext(); ) {
 				final JvmArg arg = i.next();
@@ -169,7 +174,7 @@ public class ForkingMain {
 					break;
 				}
 			}
-			modifiableArgsList.add( argToOverride );
+			modifiableArgsList.add( argToAppend );
 		}
 		return modifiableArgsList;
 	}

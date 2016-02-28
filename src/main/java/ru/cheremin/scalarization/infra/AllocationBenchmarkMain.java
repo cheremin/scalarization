@@ -18,7 +18,7 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
  */
 public class AllocationBenchmarkMain {
 
-	public static final String SCENARIO_CLASS_NAME = System.getProperty( "scenario" );
+	public static final String SCENARIO_CLASS_NAME = "ru.cheremin.scalarization." + System.getProperty( "scenario" );
 
 	public static final int ITERATIONS_IN_BATCH = Integer.getInteger( "iterations-in-batch", 1024 );
 	public static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 3000 );
@@ -32,10 +32,11 @@ public class AllocationBenchmarkMain {
 
 
 	public static void main( final String[] args ) throws Exception {
-		final Class<?> clazz = Class.forName( AllocationBenchmarkMain.class.getPackage().getName() + '.' + SCENARIO_CLASS_NAME );
+		final Class<?> clazz = Class.forName( SCENARIO_CLASS_NAME );
 		final AllocationScenario scenario = ( AllocationScenario ) clazz.newInstance();
 
-		System.out.println( "\n=======================================================" );
+		System.out.println( "\n>>>>>>>>>>>>> START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
+		//TODO RC: print DoEscapeAnalysis enabled/disabled
 		System.out.printf(
 				"JDK: %s, JVM: %s\nOS: '%s' %s arch: %s\n",
 				System.getProperty( "java.version" ),
@@ -70,7 +71,7 @@ public class AllocationBenchmarkMain {
 
 		//print results
 		printResults( benchmarkResults );
-		System.out.println( "\n=======================================================" );
+		System.out.println( "\n<<<<<<<<<<<<<<< END <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n" );
 	}
 
 	private static void runBenchmark( final AllocationScenario scenario,

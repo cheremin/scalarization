@@ -1,7 +1,11 @@
 package ru.cheremin.scalarization.scenarios.plain;
 
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.google.common.collect.Lists;
+import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
@@ -186,5 +190,57 @@ public class FixedSizeObjectAllocator extends AllocationScenario {
 		ALLOCATE_CONDITIONALLY,
 		ALLOCATE_UN_CONDITIONALLY,
 		ALLOCATE_UN_CONDITIONALLY2;
+	}
+
+	@ScenarioRunArgs
+	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+		final List<ForkingMain.ScenarioRun> runs = Lists.newArrayList();
+		final int[] sizes = { 0, 1, 2, 4, 8, 16, 32 };
+
+
+		runs.add(
+				runWith(
+						"scenario.size", "-1",
+						"scenario.use-type", Type.ALLOCATE_ONCE
+				)
+		);
+		runs.add(
+				runWith(
+						"scenario.size", "-1",
+						"scenario.use-type", Type.ALLOCATE_CONDITIONALLY
+				)
+		);
+		runs.add(
+				runWith(
+						"scenario.size", "-1",
+						"scenario.use-type", Type.ALLOCATE_UN_CONDITIONALLY
+				)
+		);
+		runs.add(
+				runWith(
+						"scenario.size", "-1",
+						"scenario.use-type", Type.ALLOCATE_UN_CONDITIONALLY2
+				)
+		);
+
+		for( final int size : sizes ) {
+			runs.add(
+					runWith(
+							"scenario.size", size,
+							"scenario.use-type", Type.ALLOCATE_IN_LOOP
+					)
+			);
+		}
+		for( final int size : sizes ) {
+			runs.add(
+					runWith(
+							"scenario.size", size,
+							"scenario.use-type", Type.REPLACE_REFERENCE_IN_LOOP
+					)
+			);
+		}
+
+
+		return runs;
 	}
 }
