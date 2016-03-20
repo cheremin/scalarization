@@ -35,12 +35,12 @@ public class HashCodeBuilderScenario extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return Arrays.asList(
-				runWith( "scenario.size", "0" ),
-				runWith( "scenario.size", "1" ),
-				runWith( "scenario.size", "2" ),
-				runWith( "scenario.size", "4" ),
-				runWith( "scenario.size", "16" ),
-				runWith( "scenario.size", "128" )
+				runWith( SCENARIO_SIZE_KEY, "0" ),
+				runWith( SCENARIO_SIZE_KEY, "1" ),
+				runWith( SCENARIO_SIZE_KEY, "2" ),
+				runWith( SCENARIO_SIZE_KEY, "4" ),
+				runWith( SCENARIO_SIZE_KEY, "16" ),
+				runWith( SCENARIO_SIZE_KEY, "128" )
 		);
 	}
 

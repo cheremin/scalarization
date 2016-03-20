@@ -1,7 +1,10 @@
 package ru.cheremin.scalarization.scenarios.tricky;
 
+import java.util.*;
 import java.util.concurrent.Callable;
 
+import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
@@ -25,6 +28,13 @@ public class NewRunnableScenario extends AllocationScenario {
 		);
 		object.run();
 		return object.name.length();
+	}
+
+	@ScenarioRunArgs
+	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+		return Arrays.asList(
+				runWith( SCENARIO_SIZE_KEY, -1 )
+		);
 	}
 
 

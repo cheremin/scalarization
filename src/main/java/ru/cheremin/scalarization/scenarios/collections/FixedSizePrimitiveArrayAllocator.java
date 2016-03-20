@@ -1,28 +1,35 @@
 package ru.cheremin.scalarization.scenarios.collections;
 
+import java.util.*;
+
+import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
  * Both 1.8.0_73 and 1.7.0_25 JVMs:
  * <p/>
  * With explicit cell access, like array[4], array is scalarized if length <= 64
- * With vectorized (looping) access array is not scalarized with length >1 (and is
+ * With vectorized (looping) access array is NOT scalarized with length >1 (and IS
  * scalarized for length = 1).
  * Manual loop unrolling with switch still allow to scalarize array
- *
- *
+ * <p/>
+ * <p/>
  * TODO RC: random index array access
+ * TODO RC: random array length
+ *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
-public class PrimitiveArrayAllocator extends AllocationScenario {
-	private static final boolean VECTORIZED = Boolean.getBoolean( "scenario.vectorized-array-access" );
+public class FixedSizePrimitiveArrayAllocator extends AllocationScenario {
+	private static final String VECTORIZED_ACCESS_KEY = "scenario.vectorized-array-access";
+	private static final boolean VECTORIZED = Boolean.getBoolean( VECTORIZED_ACCESS_KEY );
 
 	@Override
 	public long allocate() {
 		final int[] array = new int[SIZE];
 
-		fill( array, ( int ) 42 );
+		fill( array, 42 );
 
 		return sum( array );
 	}
@@ -127,5 +134,29 @@ public class PrimitiveArrayAllocator extends AllocationScenario {
 	@Override
 	public String additionalInfo() {
 		return VECTORIZED ? "vectorized" : "manually unrolled";
+	}
+
+	@ScenarioRunArgs
+	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+		return  Arrays.asList(
+				runWith( SCENARIO_SIZE_KEY, "0", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "0", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "1", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "1", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "2", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "2", VECTORIZED_ACCESS_KEY, false ),
+
+
+				runWith( SCENARIO_SIZE_KEY, "16", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "16", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "64", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "64", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "65", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "65", VECTORIZED_ACCESS_KEY, false )
+		);
 	}
 }

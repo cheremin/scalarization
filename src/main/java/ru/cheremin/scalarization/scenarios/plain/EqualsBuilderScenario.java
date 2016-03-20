@@ -53,4 +53,6 @@ public class EqualsBuilderScenario extends AllocationScenario {
 			return this;
 		}
 	}
+
+
 }

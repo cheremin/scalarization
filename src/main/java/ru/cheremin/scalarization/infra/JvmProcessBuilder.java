@@ -43,6 +43,10 @@ public class JvmProcessBuilder {
 		return appendArgsOverriding( convertSystemProperties( systemProperties ) );
 	}
 
+	public JvmProcessBuilder appendArgOverriding( final JvmArg argToAppend ) {
+		return appendArgsOverriding( ImmutableList.of( argToAppend ) );
+	}
+
 	public JvmProcessBuilder appendArgsOverriding( final Iterable<JvmArg> argsToAppend ) {
 		final List<JvmArg> modifiedArgs = appendArgsOverriding( jvmArguments, argsToAppend );
 		return new JvmProcessBuilder(

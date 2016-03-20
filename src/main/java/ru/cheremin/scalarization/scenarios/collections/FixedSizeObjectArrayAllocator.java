@@ -1,18 +1,23 @@
 package ru.cheremin.scalarization.scenarios.collections;
 
+import java.util.*;
+
+import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
  * Only array of size 1 is scalarized with 1.8. Array of size >=2 is not scalarized
- *
+ * <p/>
  * TODO RC: random index array access
  * TODO RC: check array of size 0 (with .getClass())
  *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
-public class ObjectArrayAllocator extends AllocationScenario {
-	private static final boolean VECTORIZED = Boolean.getBoolean( "scenario.vectorized-array-access" );
+public class FixedSizeObjectArrayAllocator extends AllocationScenario {
+	private static final String VECTORIZED_ACCESS_KEY = "scenario.vectorized-array-access";
+	private static final boolean VECTORIZED = Boolean.getBoolean( VECTORIZED_ACCESS_KEY );
 
 	@Override
 	public long allocate() {
@@ -126,6 +131,30 @@ public class ObjectArrayAllocator extends AllocationScenario {
 	@Override
 	public String additionalInfo() {
 		return VECTORIZED ? "vectorized" : "manually unrolled";
+	}
+
+	@ScenarioRunArgs
+	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+		return Arrays.asList(
+				runWith( SCENARIO_SIZE_KEY, "0", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "0", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "1", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "1", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "2", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "2", VECTORIZED_ACCESS_KEY, false ),
+
+
+				runWith( SCENARIO_SIZE_KEY, "16", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "16", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "64", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "64", VECTORIZED_ACCESS_KEY, false ),
+
+				runWith( SCENARIO_SIZE_KEY, "65", VECTORIZED_ACCESS_KEY, true ),
+				runWith( SCENARIO_SIZE_KEY, "65", VECTORIZED_ACCESS_KEY, false )
+		);
 	}
 
 }

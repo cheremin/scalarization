@@ -185,8 +185,10 @@ public class FixedSizeObjectAllocator extends AllocationScenario {
 
 	public enum Type {
 		ALLOCATE_ONCE,
+
 		ALLOCATE_IN_LOOP,
 		REPLACE_REFERENCE_IN_LOOP,
+
 		ALLOCATE_CONDITIONALLY,
 		ALLOCATE_UN_CONDITIONALLY,
 		ALLOCATE_UN_CONDITIONALLY2;

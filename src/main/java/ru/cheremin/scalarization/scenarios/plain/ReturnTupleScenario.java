@@ -1,5 +1,9 @@
 package ru.cheremin.scalarization.scenarios.plain;
 
+import java.util.*;
+
+import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
@@ -7,27 +11,38 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
 
 /**
  * Check pattern: method with multiple return values wrapped in composite object.
- *
- *
+ * Successfully scalarized with 1.7/1.8
  *
  * @author ruslan
  *         created 09/02/16 at 21:41
  */
 public class ReturnTupleScenario extends AllocationScenario {
-	private final StringKeysGenerator generator = randomKeysGenerator( SIZE );
+	private final StringKeysGenerator generator = randomKeysGenerator( 1024 );
 
 	@Override
 	public long allocate() {
-		final Tuple2<String> tuple = createTuple2();
+		final Tuple2<String> tuple = createTuple2(
+				generator.next(),
+				generator.next()
+		);
 
 		return tuple.getItem1().length()
 				+ tuple.getItem2().length();
 	}
 
-	private Tuple2<String> createTuple2() {
-		final String key1 = generator.next();
-		final String key2 = generator.next();
+	private Tuple2<String> createTuple2( final String item1,
+	                                     final String item2 ) {
+		final String key1 = item1;
+		final String key2 = item2;
 		return new Tuple2( key1, key2 );
+	}
+
+
+	@ScenarioRunArgs
+	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+		return Arrays.asList(
+				runWith( SCENARIO_SIZE_KEY, -1 )
+		);
 	}
 
 	public static class Tuple2<T> {

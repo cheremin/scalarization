@@ -131,6 +131,12 @@
             <version>10.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.10</version>
+        </dependency>
+
         <!-- Thread-safety annotations from Java Concurrency in Practice -->
         <dependency>
             <groupId>net.jcip</groupId>

@@ -15,7 +15,7 @@ public class EnumValuesIterateAllocator extends AllocationScenario {
 	@Override
 	public long allocate() {
 		long sum = 0;
-		final SmallEnum[] values = SmallEnum.values();
+		final Enum3[] values = Enum3.values();
 //		for( final SmallEnum e : values ) {
 //			sum += e.ordinal();
 //		}
@@ -23,14 +23,17 @@ public class EnumValuesIterateAllocator extends AllocationScenario {
 	}
 
 
+	public static enum Enum1 {
+		ONLY
+	}
 
-	public static enum SmallEnum {
+	public static enum Enum3 {
 		FIRST,
 		SECOND,
 		THIRD
 	}
 
-	public static enum HugeEnum {
+	public static enum Enum70 {
 		_1, _2, _3, _4, _5, _6, _7, _8, _9, _10,
 		_11, _12, _13, _14, _15, _16, _17, _18, _19, _20,
 		_21, _22, _23, _24, _25, _26, _27, _28, _29, _30,

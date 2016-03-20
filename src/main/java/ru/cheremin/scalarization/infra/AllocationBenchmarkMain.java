@@ -18,7 +18,8 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
  */
 public class AllocationBenchmarkMain {
 
-	public static final String SCENARIO_CLASS_NAME = "ru.cheremin.scalarization." + System.getProperty( "scenario" );
+	public static final String SCENARIO_CLASS_KEY = "scenario";
+	public static final String SCENARIO_CLASS_NAME = System.getProperty( SCENARIO_CLASS_KEY );
 
 	public static final int ITERATIONS_IN_BATCH = Integer.getInteger( "iterations-in-batch", 1024 );
 	public static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 3000 );

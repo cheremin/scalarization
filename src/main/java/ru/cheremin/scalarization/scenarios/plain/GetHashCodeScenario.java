@@ -1,42 +1,48 @@
 package ru.cheremin.scalarization.scenarios.plain;
 
+import java.util.*;
+
+import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.MapGetWithTupleKeyScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
 
 /**
- * String2Key allocations is most likely eliminated successfully. {@linkplain #getHashCode(String2Key)}
- * may be public or private.
+ * .hashCode() is very like something "identity-like" (object-y), so I've tried to
+ * check is calling .hashCode() prevents scalarization. Looks like it is not,
+ * overwritten .hashCode() behaves as any other method in relate to scalarization:
+ * String2Key allocations is most likely eliminated successfully.
+ * ({@linkplain #getHashCode(String2Key)} may be public or private)
  * <p/>
  * TODO: How it depends on StringKey size? Make String64Key?
- * TODO: Why keys not scalarized in {@linkplain MapGetWithTupleKeyScenario}?
  *
  * @author ruslan
  *         created 09/02/16 at 23:51
  */
 public class GetHashCodeScenario extends AllocationScenario {
-	private final String[] keys = Utils.generateStringArray( SIZE );
+	private final Utils.StringKeysGenerator keysGenerator = Utils.randomKeysGenerator( 1024 );
 
 
 	@Override
 	public long allocate() {
-		final String key1 = nextKey();
-		final String key2 = nextKey();
+		final String key1 = keysGenerator.next();
+		final String key2 = keysGenerator.next();
 
 		final String2Key key = new String2Key( key1, key2 );
 
 		return getHashCode( key );
 	}
 
-	private int index = 0;
-
-	public String nextKey() {
-		index = ( index + 1 ) % keys.length;
-		return keys[index];
-	}
-
 	private int getHashCode( final String2Key key ) {
 		return key.hashCode();
+	}
+
+
+	@ScenarioRunArgs
+	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+		return Arrays.asList(
+				runWith( SCENARIO_SIZE_KEY, -1 )
+		);
 	}
 
 	public static class String2Key {

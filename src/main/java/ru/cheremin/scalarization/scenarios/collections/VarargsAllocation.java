@@ -4,17 +4,16 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
 
 /**
-
  * But for Object[]/int[] size <= 64! (see <a href="http://www.javaspecialists.eu/archive/Issue179.html">link</a>)
  * ...but only if all accesses are going to explicit cells, args[7].
- *
- * TODO : If access is going via looping -- array scalarized only for 1 element. Why?
+ * <p/>
+ * If access is going via looping -- array scalarized only for 1 element
  *
  * @author ruslan
  *         created 09/02/16 at 13:19
  */
 public class VarargsAllocation extends AllocationScenario {
-	private final String[] keys = Utils.generateStringArray( SIZE );
+	private final Utils.StringKeysGenerator keys = Utils.randomKeysGenerator( 1024 );
 
 	@Override
 	public long allocate() {
@@ -46,11 +45,4 @@ public class VarargsAllocation extends AllocationScenario {
 //		}
 //		return args[0] + args[2] + + args[4] + args[16] + args.length;
 //	}
-
-	private int index = 0;
-
-	public String nextKey() {
-		index = ( index + 1 ) % keys.length;
-		return keys[index];
-	}
 }
