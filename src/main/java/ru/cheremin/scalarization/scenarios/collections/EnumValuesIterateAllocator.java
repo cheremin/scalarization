@@ -4,6 +4,8 @@ package ru.cheremin.scalarization.scenarios.collections;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
+ * Seems like no way .values() could be scalarized...
+ *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
@@ -13,10 +15,11 @@ public class EnumValuesIterateAllocator extends AllocationScenario {
 	@Override
 	public long allocate() {
 		long sum = 0;
-		for( final SmallEnum e : SmallEnum.values() ) {
-			sum += e.ordinal();
-		}
-		return sum;
+		final SmallEnum[] values = SmallEnum.values();
+//		for( final SmallEnum e : values ) {
+//			sum += e.ordinal();
+//		}
+		return values[2].ordinal();
 	}
 
 

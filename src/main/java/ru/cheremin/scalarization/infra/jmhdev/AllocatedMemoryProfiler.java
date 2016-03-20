@@ -1,4 +1,4 @@
-package ru.cheremin.scalarization.scenarios.jmhdev;
+package ru.cheremin.scalarization.infra.jmhdev;
 
 import java.util.*;
 

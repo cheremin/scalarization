@@ -24,6 +24,8 @@ public class AllocationBenchmarkMain {
 	public static final int SINGLE_BENCHMARK_TIME_MS = Integer.getInteger( "duration", 3000 );
 	public static final int RUNS = Integer.getInteger( "runs", 12 );
 
+	public static final boolean CSV_OUTPUT = Boolean.getBoolean( "output.csv" );
+
 	/**
 	 * Bytes allocated in {@linkplain ThreadMXBean#getThreadAllocatedBytes(long)}for
 	 * 2 long[1] arrays
@@ -98,23 +100,49 @@ public class AllocationBenchmarkMain {
 	}
 
 	private static void printResults( final BenchmarkResult[] results ) {
+		if( CSV_OUTPUT ) {
+			System.out.print(
+					"run #, " +
+							" allocations?, " +
+							" allocated bytes, " +
+							" iterations, " +
+							" bytes/iteration, " +
+							" GCs count, " +
+							" Total ms in GC, " +
+							" 'result'\n"
+			);
+		}
 		for( int i = 0; i < results.length; i++ ) {
 			final BenchmarkResult result = results[i];
 			final boolean noAllocations =
 					result.gcCollectionCount == 0
 							&& result.gcCollectionTime == 0
 							&& ( result.memoryAllocatedByThreadBytes <= INFRASTRUCTURE_ALLOCATION_BYTES );
-			System.out.printf(
-					"run[#%d]: %s. (Details: allocated %d bytes/%d iterations ~= %.2f bytes/iteration, %d GCs %d ms in total, 'result' = %d) \n",
-					i,
-					( noAllocations ? "likely NO_ALLOCATIONS" : "likely ARE_ALLOCATIONS" ),
-					result.memoryAllocatedByThreadBytes,
-					result.totalIterations,
-					1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations,
-					result.gcCollectionCount,
-					result.gcCollectionTime,
-					result.benchmarkResult
-			);
+			if( CSV_OUTPUT ) {
+				System.out.printf(
+						"%d, %s, %d, %d, %.2f, %d , %d , %d \n",
+						i,
+						( noAllocations ? "likely NO_ALLOCATIONS" : "likely ARE_ALLOCATIONS" ),
+						result.memoryAllocatedByThreadBytes,
+						result.totalIterations,
+						1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations,
+						result.gcCollectionCount,
+						result.gcCollectionTime,
+						result.benchmarkResult
+				);
+			} else {
+				System.out.printf(
+						"run[#%d]: %s. (Details: allocated %d bytes/%d iterations ~= %.2f bytes/iteration, %d GCs %d ms in total, 'result' = %d) \n",
+						i,
+						( noAllocations ? "likely NO_ALLOCATIONS" : "likely ARE_ALLOCATIONS" ),
+						result.memoryAllocatedByThreadBytes,
+						result.totalIterations,
+						1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations,
+						result.gcCollectionCount,
+						result.gcCollectionTime,
+						result.benchmarkResult
+				);
+			}
 		}
 	}
 
