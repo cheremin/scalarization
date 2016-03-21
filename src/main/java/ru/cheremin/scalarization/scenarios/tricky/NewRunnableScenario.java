@@ -3,9 +3,10 @@ package ru.cheremin.scalarization.scenarios.tricky;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.scenarios.ScenarioRunsUtils;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
 import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
@@ -19,7 +20,7 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
  *         created 10/02/16 at 15:11
  */
 public class NewRunnableScenario extends AllocationScenario {
-	private final StringKeysGenerator generator = randomKeysGenerator( SIZE );
+	private final StringKeysGenerator generator = randomKeysGenerator( 1024 );
 
 	@Override
 	public long allocate() {
@@ -31,9 +32,9 @@ public class NewRunnableScenario extends AllocationScenario {
 	}
 
 	@ScenarioRunArgs
-	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
+	public static List<ScenarioRun> parametersToRunWith() {
 		return Arrays.asList(
-				runWith( SCENARIO_SIZE_KEY, -1 )
+				ScenarioRunsUtils.runWith( SCENARIO_SIZE_KEY, -1 )
 		);
 	}
 

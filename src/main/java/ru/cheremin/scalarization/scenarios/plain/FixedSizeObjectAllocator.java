@@ -4,9 +4,11 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.collect.Lists;
-import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
+
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.runWith;
 
 /**
  * Check simple Vector2D arithmetic in different scenarios
@@ -195,36 +197,35 @@ public class FixedSizeObjectAllocator extends AllocationScenario {
 	}
 
 	@ScenarioRunArgs
-	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
-		final List<ForkingMain.ScenarioRun> runs = Lists.newArrayList();
-		final int[] sizes = { 0, 1, 2, 4, 8, 16, 32 };
-
+	public static List<ScenarioRun> parametersToRunWith() {
+		final List<ScenarioRun> runs = Lists.newArrayList();
 
 		runs.add(
 				runWith(
-						"scenario.size", "-1",
+						"scenario.size", -1,
 						"scenario.use-type", Type.ALLOCATE_ONCE
 				)
 		);
 		runs.add(
 				runWith(
-						"scenario.size", "-1",
+						"scenario.size", -1,
 						"scenario.use-type", Type.ALLOCATE_CONDITIONALLY
 				)
 		);
 		runs.add(
 				runWith(
-						"scenario.size", "-1",
+						"scenario.size", -1,
 						"scenario.use-type", Type.ALLOCATE_UN_CONDITIONALLY
 				)
 		);
 		runs.add(
 				runWith(
-						"scenario.size", "-1",
+						"scenario.size", -1,
 						"scenario.use-type", Type.ALLOCATE_UN_CONDITIONALLY2
 				)
 		);
 
+		final int[] sizes = { 0, 1, 2, 4, 8, 16, 32 };
 		for( final int size : sizes ) {
 			runs.add(
 					runWith(

@@ -3,9 +3,14 @@ package ru.cheremin.scalarization.scenarios.collections;
 
 import java.util.*;
 
+import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.scenarios.ScenarioRunsUtils;
 
 /**
+ * Check is ArrayList scalarized, at least for small sizes?
+ *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
@@ -19,5 +24,12 @@ public class ArrayListAllocator extends AllocationScenario {
 		}
 		list.clear();
 		return list.size();
+	}
+
+	@ScenarioRunArgs
+	public static List<ScenarioRun> parametersToRunWith() {
+		return ScenarioRunsUtils.runForAll(
+				SCENARIO_SIZE_KEY, 0, 1, 2, 4
+		);
 	}
 }

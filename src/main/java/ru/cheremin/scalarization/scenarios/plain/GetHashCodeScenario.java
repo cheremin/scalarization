@@ -2,10 +2,12 @@ package ru.cheremin.scalarization.scenarios.plain;
 
 import java.util.*;
 
-import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
+
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.withoutSpecificParameters;
 
 /**
  * .hashCode() is very like something "identity-like" (object-y), so I've tried to
@@ -16,6 +18,7 @@ import ru.cheremin.scalarization.scenarios.Utils;
  * <p/>
  * TODO: How it depends on StringKey size? Make String64Key?
  *
+ * @see ru.cheremin.scalarization.scenarios.tricky.ObjectyStaffScenario
  * @author ruslan
  *         created 09/02/16 at 23:51
  */
@@ -39,10 +42,8 @@ public class GetHashCodeScenario extends AllocationScenario {
 
 
 	@ScenarioRunArgs
-	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
-		return Arrays.asList(
-				runWith( SCENARIO_SIZE_KEY, -1 )
-		);
+	public static List<ScenarioRun> parametersToRunWith() {
+		return withoutSpecificParameters();
 	}
 
 	public static class String2Key {

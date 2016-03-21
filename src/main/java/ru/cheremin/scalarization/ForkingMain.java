@@ -7,13 +7,14 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
-import ru.cheremin.scalarization.infra.*;
+import ru.cheremin.scalarization.infra.AllocationBenchmarkMain;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedFlag;
 import ru.cheremin.scalarization.infra.JvmArg.SystemProperty;
+import ru.cheremin.scalarization.infra.JvmProcessBuilder;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
@@ -114,27 +115,4 @@ public class ForkingMain {
 		return Collections.EMPTY_LIST;
 	}
 
-	/**
-	 * List of additional jvm args to run specific scenario with.
-	 */
-	public static class ScenarioRun {
-		private final List<JvmArg> jvmArgs;
-
-		public ScenarioRun( final List<JvmArg> jvmArgs ) {
-			this.jvmArgs = Lists.newArrayList( jvmArgs );
-		}
-
-		public ScenarioRun( final JvmArg... jvmArgs ) {
-			this.jvmArgs = Lists.newArrayList( jvmArgs );
-		}
-
-		public List<JvmArg> getJvmArgs() {
-			return jvmArgs;
-		}
-
-		@Override
-		public String toString() {
-			return jvmArgs.toString();
-		}
-	}
 }

@@ -3,6 +3,11 @@ package ru.cheremin.scalarization.scenarios;
 
 import java.util.*;
 
+import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
+
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.runForAll;
+
 /**
  * @author ruslan
  *         created 13.11.12 at 23:11
@@ -29,5 +34,11 @@ public class IteratorAllocator extends AllocationScenario {
 			sum += i;
 		}
 		return sum;
+	}
+
+	@ScenarioRunArgs
+	public static List<ScenarioRun> parametersToRunWith() {
+		//TODO RC: array vs linked list
+		return runForAll( SCENARIO_SIZE_KEY, 0, 1, 2, 4, 64, 65 );
 	}
 }

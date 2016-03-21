@@ -1,7 +1,13 @@
 package ru.cheremin.scalarization.scenarios.collections;
 
 
+import java.util.*;
+
+import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
+
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.runForAll;
 
 /**
  * Seems like no way .values() could be scalarized...
@@ -14,12 +20,30 @@ public class EnumValuesIterateAllocator extends AllocationScenario {
 
 	@Override
 	public long allocate() {
-		long sum = 0;
-		final Enum3[] values = Enum3.values();
-//		for( final SmallEnum e : values ) {
-//			sum += e.ordinal();
-//		}
-		return values[2].ordinal();
+		switch( SIZE ) {
+			case 1: {
+				final Enum1[] values = Enum1.values();
+				return values[0].ordinal();
+			}
+			case 3: {
+				final Enum3[] values = Enum3.values();
+				return values[2].ordinal();
+			}
+			case 70: {
+				final Enum70[] values = Enum70.values();
+				return values[42].ordinal();
+			}
+			default:
+				throw new IllegalStateException( SIZE + " is not supported" );
+		}
+
+	}
+
+	@ScenarioRunArgs
+	public static List<ScenarioRun> parametersToRunWith() {
+		return runForAll(
+				SCENARIO_SIZE_KEY, 1, 3, 70
+		);
 	}
 
 

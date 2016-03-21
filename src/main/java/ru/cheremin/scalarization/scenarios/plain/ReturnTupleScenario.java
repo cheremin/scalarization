@@ -2,11 +2,12 @@ package ru.cheremin.scalarization.scenarios.plain;
 
 import java.util.*;
 
-import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.withoutSpecificParameters;
 import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
 
 /**
@@ -39,10 +40,8 @@ public class ReturnTupleScenario extends AllocationScenario {
 
 
 	@ScenarioRunArgs
-	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
-		return Arrays.asList(
-				runWith( SCENARIO_SIZE_KEY, -1 )
-		);
+	public static List<ScenarioRun> parametersToRunWith() {
+		return withoutSpecificParameters();
 	}
 
 	public static class Tuple2<T> {

@@ -3,8 +3,14 @@ package ru.cheremin.scalarization.scenarios;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
+import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
+
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.allOf;
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
+
 /**
- *
  * With SimplestMap keys are successfully scalarized on 1.8.0_73, but not on 1.7. With
  * -XX:+PrintInlining 1.7 JVM state for SimplestMap.get() : "already compiled into a
  * big method", which <a href="https://groups.google.com/forum/#!topic/mechanical-sympathy/8ARGnMds7tU">means</a>
@@ -15,38 +21,40 @@ import java.util.concurrent.ThreadLocalRandom;
  * prevents even 1.8 from scalarizing keys with same "already compiled into a big
  * method" diagnostics (but result is unstable, seems like 1.8 re-compiles method few
  * times with different results, and sometimes scalarization is resurrected).
- *
+ * <p/>
  * With THashMap.get() keys scalarized under both 1.7 and 1.8, even with default InlineSmallCode
  * size.
- *
+ * <p/>
  * With ImmutableMap.get() keys are scalarized under 1.7 only with InlineSmallCode=2000,
  * with 1000 (default) keys are not scalarized ("already compiled into a big method")
  * Under 1.8 it is scalarized with default settings (.get() method is listed as
  * inlined), even with InlineSmallCode=1000 it still inlines, and scalarization still
  * do happen.
- *
+ * <p/>
  * With HashMap.get() keys are scalarized under 1.8 with default settings, and are not
  * scalarized under 1.7 with default settings, but are scalarized with InlineSmallCode=2000
- *
+ * <p/>
  * Generally, both successful and unsuccessful lookups are scalarized/not scalarized.
  *
  * @author ruslan
  *         created 09/02/16 at 21:47
  */
 public class MapGetWithTupleKeyScenario extends AllocationScenario {
+	public static final String SUCCESSFUL_LOOKUPS_PROBABILITY_KEY = "scenario.successful-lookups-probability";
+
 	private static final double SUCCESSFUL_LOOKUPS_PROBABILITY = Double.valueOf(
-			System.getProperty( "scenario.successful-lookups-probability", "0.5" )
+			System.getProperty( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, "0.5" )
 	);
 
-	private final String[] keys = Utils.generateStringArray( SIZE );
+	private final StringKeysGenerator keys = Utils.randomKeysGenerator( 1024 );
 
 	private final HashMap<StringKey, String> map;
 
 	{
 		final HashMap<StringKey, String> map = new HashMap<>();
 		for( int i = 0; i < SIZE; i++ ) {
-			final String key1 = nextKey();
-			final String key2 = nextKey();
+			final String key1 = keys.next();
+			final String key2 = keys.next();
 			map.put( new StringKey( key1, key2 ), key1 + key2 );
 		}
 		this.map = new HashMap<>( map );
@@ -61,11 +69,11 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 		final String key1;
 		final String key2;
 		if( successful ) {
-			key1 = nextKey();
-			key2 = nextKey();
+			key1 = keys.next();
+			key2 = keys.next();
 		} else {
-			key2 = nextKey();
-			key1 = nextKey();
+			key2 = keys.next();
+			key1 = keys.next();
 		}
 
 		final StringKey combinedKey = new StringKey( key1, key2 );
@@ -82,13 +90,6 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 	@Override
 	public String additionalInfo() {
 		return ( ( int ) ( SUCCESSFUL_LOOKUPS_PROBABILITY * 100 ) ) + "% lookups successful";
-	}
-
-	private int index = 0;
-
-	public String nextKey() {
-		index = ( index + 1 ) % keys.length;
-		return keys[index];
 	}
 
 	public static class Key<T> {
@@ -207,5 +208,15 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 //			final Object[] newKeys = new Object[length*2+1];
 //
 		}
+	}
+
+	@ScenarioRunArgs
+	public static List<ScenarioRun> parametersToRunWith() {
+		//TODO RC: different map implementations
+		//TODO RC: -XX:InlineSmallCode = {1000, 2000}
+		return crossJoin(
+				allOf( SCENARIO_SIZE_KEY, 0, 1, 16, 65 ),
+		        allOf( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, 0.0, 0.5, 1.0 )
+		);
 	}
 }

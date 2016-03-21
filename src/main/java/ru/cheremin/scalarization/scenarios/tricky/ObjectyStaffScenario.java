@@ -3,12 +3,12 @@ package ru.cheremin.scalarization.scenarios.tricky;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import ru.cheremin.scalarization.ForkingMain;
+import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
+
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.allOf;
+import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
 
 /**
  * 1.8.0_73:
@@ -205,18 +205,10 @@ public class ObjectyStaffScenario extends AllocationScenario {
 	}
 
 	@ScenarioRunArgs
-	public static List<ForkingMain.ScenarioRun> parametersToRunWith() {
-		return Lists.transform(
-				ImmutableList.copyOf( Type.values() ),
-				new Function<Type, ForkingMain.ScenarioRun>() {
-					@Override
-					public ForkingMain.ScenarioRun apply( final Type type ) {
-						return runWith(
-								USE_TYPE_KEY, type.name(),
-								SCENARIO_SIZE_KEY, -1
-						);
-					}
-				}
+	public static List<ScenarioRun> parametersToRunWith() {
+		return crossJoin(
+				allOf( SCENARIO_SIZE_KEY, -1 ),
+				allOf( USE_TYPE_KEY, Type.values() )
 		);
 	}
 }
