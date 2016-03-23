@@ -3,12 +3,16 @@ package ru.cheremin.scalarization.scenarios;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.google.common.collect.ImmutableMap;
+import gnu.trove.map.hash.THashMap;
 import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedProperty;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.allOf;
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
+import static java.util.Arrays.asList;
+import static ru.cheremin.scalarization.ScenarioRun.allOf;
+import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
  * With SimplestMap keys are successfully scalarized on 1.8.0_73, but not on 1.7. With
@@ -42,13 +46,20 @@ import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
 public class MapGetWithTupleKeyScenario extends AllocationScenario {
 	public static final String SUCCESSFUL_LOOKUPS_PROBABILITY_KEY = "scenario.successful-lookups-probability";
 
+	public static final String MAP_TYPE_KEY = "scenario.map-type";
+
+
 	private static final double SUCCESSFUL_LOOKUPS_PROBABILITY = Double.valueOf(
 			System.getProperty( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, "0.5" )
+	);
+	private static final MapType MAP_TYPE = MapType.valueOf(
+			System.getProperty( MAP_TYPE_KEY, MapType.HASH_MAP.name() )
 	);
 
 	private final StringKeysGenerator keys = Utils.randomKeysGenerator( 1024 );
 
-	private final HashMap<StringKey, String> map;
+	private final Map<StringKey, String> map;
+	private final SimplestMap<StringKey, String> simplestMap;
 
 	{
 		final HashMap<StringKey, String> map = new HashMap<>();
@@ -57,14 +68,36 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 			final String key2 = keys.next();
 			map.put( new StringKey( key1, key2 ), key1 + key2 );
 		}
-		this.map = new HashMap<>( map );
+		this.simplestMap = new SimplestMap<>( map );
+		switch( MAP_TYPE ) {
+			case HASH_MAP: {
+				this.map = new HashMap<>( map );
+				break;
+			}
+			case THASH_MAP: {
+				this.map = new THashMap<>( map );
+				break;
+			}
+
+			case GUAVA_IMMUTABLE_MAP: {
+				this.map = ImmutableMap.copyOf( map );
+				break;
+			}
+			case SIMPLEST_MAP: {
+				//dummy
+				this.map = ImmutableMap.copyOf( map );
+				break;
+			}
+			default: {
+				throw new AssertionError( "Code bug: " + MAP_TYPE + " is unknown" );
+			}
+		}
 	}
 
 	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
 	@Override
 	public long allocate() {
-
 		final boolean successful = ( rnd.nextDouble() <= SUCCESSFUL_LOOKUPS_PROBABILITY );
 		final String key1;
 		final String key2;
@@ -78,7 +111,12 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 
 		final StringKey combinedKey = new StringKey( key1, key2 );
 
-		final String value = map.get( combinedKey );
+		final String value;
+		if( MAP_TYPE == MapType.SIMPLEST_MAP ) {
+			value = simplestMap.get( combinedKey );
+		} else {
+			value = map.get( combinedKey );
+		}
 
 		if( value == null ) {
 			return key1.length();
@@ -89,7 +127,7 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 
 	@Override
 	public String additionalInfo() {
-		return ( ( int ) ( SUCCESSFUL_LOOKUPS_PROBABILITY * 100 ) ) + "% lookups successful";
+		return MAP_TYPE + ": " + ( ( int ) ( SUCCESSFUL_LOOKUPS_PROBABILITY * 100 ) ) + "% lookups successful";
 	}
 
 	public static class Key<T> {
@@ -210,13 +248,28 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 		}
 	}
 
+
+	public enum MapType {
+		HASH_MAP,
+		THASH_MAP,
+		GUAVA_IMMUTABLE_MAP,
+		SIMPLEST_MAP
+	}
+
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		//TODO RC: different map implementations
-		//TODO RC: -XX:InlineSmallCode = {1000, 2000}
 		return crossJoin(
-				allOf( SCENARIO_SIZE_KEY, 0, 1, 16, 65 ),
-		        allOf( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, 0.0, 0.5, 1.0 )
+
+				allOf( SIZE_KEY, 0, 1, 16, 65 ),
+
+				allOf( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, 0.0, 0.5, 1.0 ),
+
+				allOf( MAP_TYPE_KEY, MapType.values() ),
+
+				asList(
+						new JvmExtendedProperty( "InlineSmallCode", "1000" ),
+						new JvmExtendedProperty( "InlineSmallCode", "2000" )
+				)
 		);
 	}
 }

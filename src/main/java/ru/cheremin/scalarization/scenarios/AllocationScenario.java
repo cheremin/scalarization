@@ -5,9 +5,9 @@ package ru.cheremin.scalarization.scenarios;
  *         created 09/02/16 at 12:36
  */
 public abstract class AllocationScenario {
-	public static final String SCENARIO_SIZE_KEY = "scenario.size";
+	public static final String SIZE_KEY = "scenario.size";
 
-	public static final int SIZE = Integer.getInteger( SCENARIO_SIZE_KEY, 16 );
+	public static final int SIZE = Integer.getInteger( SIZE_KEY, 16 );
 
 	public abstract long allocate();
 
@@ -18,7 +18,12 @@ public abstract class AllocationScenario {
 
 	@Override
 	public String toString() {
-		final String result = String.format( "%s[size:%d]", getClass().getSimpleName(), SIZE );
+		final String result;
+		if( SIZE < 0 ) {
+			result = getClass().getSimpleName();
+		} else {
+			result = String.format( "%s[size:%d]", getClass().getSimpleName(), SIZE );
+		}
 		final String additionalInfo = additionalInfo();
 
 		if( additionalInfo.isEmpty() ) {

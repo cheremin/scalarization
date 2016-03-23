@@ -6,7 +6,6 @@ import java.util.*;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.ScenarioRunsUtils;
 
 /**
  * Check is ArrayList scalarized, at least for small sizes?
@@ -28,8 +27,8 @@ public class ArrayListAllocator extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		return ScenarioRunsUtils.runForAll(
-				SCENARIO_SIZE_KEY, 0, 1, 2, 4
+		return ScenarioRun.runForAll(
+				SIZE_KEY, 0, 1, 2, 4
 		);
 	}
 }

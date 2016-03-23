@@ -8,7 +8,7 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.runWith;
+import static ru.cheremin.scalarization.ScenarioRun.runWith;
 
 /**
  * Check simple Vector2D arithmetic in different scenarios

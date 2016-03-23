@@ -6,8 +6,8 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.allOf;
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
+import static ru.cheremin.scalarization.ScenarioRun.allOf;
+import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
  * Both 1.8.0_73 and 1.7.0_25 JVMs:
@@ -20,6 +20,8 @@ import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
  * <p/>
  * TODO RC: random index array access
  * TODO RC: random array length
+ *
+ * TODO long/double array (possible different upper limit)
  *
  * @author ruslan
  *         created 13.11.12 at 23:11
@@ -142,7 +144,7 @@ public class FixedSizePrimitiveArrayAllocator extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SCENARIO_SIZE_KEY, 0, 1, 2, /*4, 8, 16, */ 64, 65 ),
+				allOf( SIZE_KEY, 0, 1, 2, /*4, 8, 16, */ 64, 65 ),
 				allOf( VECTORIZED_ACCESS_KEY, true, false )
 		);
 	}

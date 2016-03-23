@@ -7,8 +7,8 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.allOf;
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
+import static ru.cheremin.scalarization.ScenarioRun.allOf;
+import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
  * 1.8.0_73:
@@ -207,7 +207,7 @@ public class ObjectyStaffScenario extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SCENARIO_SIZE_KEY, -1 ),
+				allOf( SIZE_KEY, -1 ),
 				allOf( USE_TYPE_KEY, Type.values() )
 		);
 	}

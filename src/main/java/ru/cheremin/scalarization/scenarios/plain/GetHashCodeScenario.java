@@ -7,7 +7,7 @@ import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.withoutSpecificParameters;
+import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
 
 /**
  * .hashCode() is very like something "identity-like" (object-y), so I've tried to

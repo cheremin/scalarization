@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.ScenarioRunsUtils;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
 import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
@@ -34,7 +33,7 @@ public class NewRunnableScenario extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return Arrays.asList(
-				ScenarioRunsUtils.runWith( SCENARIO_SIZE_KEY, -1 )
+				ScenarioRun.runWith( SIZE_KEY, -1 )
 		);
 	}
 

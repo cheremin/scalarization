@@ -8,7 +8,7 @@ import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.withoutSpecificParameters;
+import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
 
 /**
  * Looks like HashCodeBuilder stably scalarized by 1.7-1.8

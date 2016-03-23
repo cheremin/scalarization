@@ -6,8 +6,8 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.allOf;
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.crossJoin;
+import static ru.cheremin.scalarization.ScenarioRun.allOf;
+import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
  * Only array of size 1 is scalarized with 1.8. Array of size >=2 is not scalarized
@@ -139,7 +139,7 @@ public class FixedSizeObjectArrayAllocator extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SCENARIO_SIZE_KEY, 0, 1, 2, /*4, 8, 16, */ 64, 65 ),
+				allOf( SIZE_KEY, 0, 1, 2, /*4, 8, 16, */ 64, 65 ),
 				allOf( VECTORIZED_ACCESS_KEY, true, false )
 		);
 	}

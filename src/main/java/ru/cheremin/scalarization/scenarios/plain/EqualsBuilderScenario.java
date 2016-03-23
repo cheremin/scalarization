@@ -1,9 +1,18 @@
 package ru.cheremin.scalarization.scenarios.plain;
 
+import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedProperty;
+import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
+
+import static java.util.Arrays.asList;
+import static ru.cheremin.scalarization.ScenarioRun.allOf;
+import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
  * With using at least one .append(Object,Object) method (even without looping) -> EA
@@ -24,20 +33,18 @@ import ru.cheremin.scalarization.scenarios.Utils;
  *         created 16/02/16 at 23:45
  */
 public class EqualsBuilderScenario extends AllocationScenario {
+	public static final String BUILDER_TYPE_KEY = "scenario.builder-type";
+
+	private static final BuilderType BUILDER_TYPE = BuilderType.valueOf(
+			System.getProperty( BUILDER_TYPE_KEY, BuilderType.NORMAL.name() )
+	);
+
 	private final String[] keys = Utils.generateStringArray( SIZE );
 
 
 	@Override
 	public long allocate() {
-		final EqualsBuilder builder = new EqualsBuilder();
-		for( final String key : keys ) {
-			builder.append( key, key );
-		}
-		return builder
-				.append( true, true )
-				.append( 1.1, 1.2 )
-				.append( 1, 1 )
-				.isEquals() ? 1 : 0;
+		return BUILDER_TYPE.runWithKeys( keys );
 	}
 
 
@@ -54,5 +61,50 @@ public class EqualsBuilderScenario extends AllocationScenario {
 		}
 	}
 
+	public enum BuilderType {
+		NORMAL {
+			@Override
+			public int runWithKeys( final String[] keys ) {
+				final EqualsBuilder builder = new EqualsBuilder();
+				for( final String key : keys ) {
+					builder.append( key, key );
+				}
+				return builder
+						.append( true, true )
+						.append( 1.1, 1.2 )
+						.append( 1, 1 )
+						.isEquals() ? 1 : 0;
+			}
+		},
+		EXTENDED {
+			@Override
+			public int runWithKeys( final String[] keys ) {
+				final EqualsBuilderEx builder = new EqualsBuilderEx();
+				for( final String key : keys ) {
+					builder.append( key, key );
+				}
+				return builder
+						.append( true, true )
+						.append( 1.1, 1.2 )
+						.append( 1, 1 )
+						.isEquals() ? 1 : 0;
+			}
+		};
 
+		public abstract int runWithKeys( final String[] keys );
+	}
+
+	@ScenarioRunArgs
+	public static List<ScenarioRun> parametersToRunWith() {
+		return crossJoin(
+				allOf( SIZE_KEY, 0, 1, 4, 128 ),
+
+				allOf( BUILDER_TYPE_KEY, BuilderType.values() ),
+
+				asList(
+						new JvmExtendedProperty( "FreqInlineSize", "325" ),
+						new JvmExtendedProperty( "FreqInlineSize", "500" )
+				)
+		);
+	}
 }

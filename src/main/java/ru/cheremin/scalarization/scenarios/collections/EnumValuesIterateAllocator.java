@@ -7,7 +7,7 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.scenarios.ScenarioRunsUtils.runForAll;
+import static ru.cheremin.scalarization.ScenarioRun.runForAll;
 
 /**
  * Seems like no way .values() could be scalarized...
@@ -42,7 +42,7 @@ public class EnumValuesIterateAllocator extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return runForAll(
-				SCENARIO_SIZE_KEY, 1, 3, 70
+				SIZE_KEY, 1, 3, 70
 		);
 	}
 
