@@ -1,4 +1,4 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.misc;
 
 
 import java.util.*;
@@ -6,6 +6,7 @@ import java.util.*;
 import gnu.trove.set.hash.THashSet;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;

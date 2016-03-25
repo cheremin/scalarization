@@ -8,11 +8,11 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedProperty;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils;
 
 import static java.util.Arrays.asList;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
+import static ru.cheremin.scalarization.scenarios.Utils.generateStringArray;
 
 /**
  * With using at least one .append(Object,Object) method (even without looping) -> EA
@@ -39,7 +39,7 @@ public class EqualsBuilderScenario extends AllocationScenario {
 			System.getProperty( BUILDER_TYPE_KEY, BuilderType.NORMAL.name() )
 	);
 
-	private final String[] keys = Utils.generateStringArray( SIZE );
+	private final String[] keys = generateStringArray( SIZE );
 
 
 	@Override
@@ -47,6 +47,10 @@ public class EqualsBuilderScenario extends AllocationScenario {
 		return BUILDER_TYPE.runWithKeys( keys );
 	}
 
+	@Override
+	public String additionalInfo() {
+		return BUILDER_TYPE.name();
+	}
 
 	public static final class EqualsBuilderEx extends EqualsBuilder {
 		public EqualsBuilderEx() {

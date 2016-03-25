@@ -20,6 +20,8 @@ import ru.cheremin.scalarization.infra.JvmProcessBuilder;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
+import static java.lang.ProcessBuilder.Redirect.PIPE;
+
 /**
  * @author ruslan
  *         created 23/02/16 at 19:41
@@ -100,8 +102,12 @@ public class ForkingMain {
 				final List<String> forkedJvmCmd = jvmWithStaticArgs.buildJvmCommandLine();
 				final Process process = new ProcessBuilder( forkedJvmCmd )
 //						.redirectOutput( appendTo( scenarioOutputFile ) )
+						.redirectOutput( PIPE )
 						.inheritIO()
 						.start();
+				//TODO process pumper, redirect stream and wait for process to finish
+//				new StreamPumper(process.getInputStream(), )
+
 				process.waitFor();
 			}
 		} else {

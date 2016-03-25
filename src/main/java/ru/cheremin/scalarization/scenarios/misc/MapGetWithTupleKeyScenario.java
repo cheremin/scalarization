@@ -1,4 +1,4 @@
-package ru.cheremin.scalarization.scenarios;
+package ru.cheremin.scalarization.scenarios.misc;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -8,6 +8,8 @@ import gnu.trove.map.hash.THashMap;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedProperty;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
+import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.scenarios.Utils;
 import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
 import static java.util.Arrays.asList;

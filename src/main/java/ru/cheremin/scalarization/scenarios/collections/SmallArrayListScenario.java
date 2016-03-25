@@ -13,7 +13,7 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
-public class ArrayListAllocator extends AllocationScenario {
+public class SmallArrayListScenario extends AllocationScenario {
 
 	@Override
 	public long allocate() {
