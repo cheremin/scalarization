@@ -1,4 +1,4 @@
-package ru.cheremin.scalarization.scenarios.plain;
+package ru.cheremin.scalarization.scenarios.tricky;
 
 import java.util.*;
 
@@ -14,11 +14,14 @@ import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
  * check is calling .hashCode() prevents scalarization. Looks like it is not,
  * overwritten .hashCode() behaves as any other method in relate to scalarization:
  * String2Key allocations is most likely eliminated successfully.
- * ({@linkplain #getHashCode(String2Key)} may be public or private)
+ * (Even with {@linkplain #getHashCode(String2Key)} public or private).
  * <p/>
+ * See {@linkplain ObjectyStaffScenario} for more objecty-tests like this
+ * one. Maybe even remove this test, since it is duplicated there
+ *
+ *
  * TODO: How it depends on StringKey size? Make String64Key?
  *
- * @see ru.cheremin.scalarization.scenarios.tricky.ObjectyStaffScenario
  * @author ruslan
  *         created 09/02/16 at 23:51
  */

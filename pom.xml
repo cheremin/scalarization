@@ -74,12 +74,6 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jmock</groupId>
-            <artifactId>jmock-junit4</artifactId>
-            <version>2.5.1</version>
-            <scope>test</scope>
-        </dependency>
 
 
         <!-- fast open addressing maps/sets, and primitive (int, double) collections -->
@@ -128,7 +122,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>10.0</version>
+            <version>19.0</version>
         </dependency>
 
         <dependency>
@@ -150,11 +144,6 @@
             <version>3.4.0</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>org.affinity</groupId>
-            <artifactId>affinity</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
-        </dependency>-->
 
     </dependencies>
 

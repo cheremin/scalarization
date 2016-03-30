@@ -22,6 +22,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 
 	@Override
 	public long allocate() {
+
 		final Tuple2<String> tuple = createTuple2(
 				generator.next(),
 				generator.next()
@@ -31,6 +32,8 @@ public class ReturnTupleScenario extends AllocationScenario {
 				+ tuple.getItem2().length();
 	}
 
+	//TODO RC: try return null!
+	//TODO RC: return different subtypes of common supertype
 	private Tuple2<String> createTuple2( final String item1,
 	                                     final String item2 ) {
 		final String key1 = item1;

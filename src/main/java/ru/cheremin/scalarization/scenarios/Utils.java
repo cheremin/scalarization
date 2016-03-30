@@ -35,4 +35,22 @@ public class Utils {
 			return keys[index];
 		}
 	}
+
+	public static class BytecodePadder {
+		private long value;
+
+		public void pad() {
+			//code is taken from Blackhole with small mods. The idea is similar, but
+			//  not the same: I also want to avoid DCE to eliminate my code, so I
+			//  need "JIT-unpredictable" side-effect. But I do not need to spent CPU
+			//  cycles, I just need to insert some amount of bytecodes, which can't
+			//  be removed
+			value = ( value * 0x5DEECE66DL + 0xBL ) & ( 0xFFFFFFFFFFFFL );
+		}
+
+		public long value() {
+			return value;
+		}
+	}
+
 }
