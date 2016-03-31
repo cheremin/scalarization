@@ -6,6 +6,7 @@ import java.util.*;
 import javax.annotation.concurrent.Immutable;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.openjdk.jmh.util.Utils;
@@ -49,6 +50,21 @@ public class JvmProcessBuilder {
 
 	public JvmProcessBuilder appendArgsOverriding( final Iterable<JvmArg> argsToAppend ) {
 		final List<JvmArg> modifiedArgs = appendArgsOverriding( jvmArguments, argsToAppend );
+		return new JvmProcessBuilder(
+				classPath,
+				pathToJvmExecutable,
+				modifiedArgs,
+				mainClass
+		);
+	}
+
+	public JvmProcessBuilder removeArg( final Predicate<JvmArg> filter ) {
+		final ArrayList<JvmArg> modifiedArgs = new ArrayList<>();
+		for( final JvmArg jvmArg : jvmArguments ) {
+			if( !filter.apply( jvmArg ) ) {
+				modifiedArgs.add( jvmArg );
+			}
+		}
 		return new JvmProcessBuilder(
 				classPath,
 				pathToJvmExecutable,
@@ -176,5 +192,6 @@ public class JvmProcessBuilder {
 		}
 		return jvmArgs;
 	}
+
 
 }

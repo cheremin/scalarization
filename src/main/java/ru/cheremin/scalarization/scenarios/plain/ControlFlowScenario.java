@@ -30,7 +30,7 @@ import static ru.cheremin.scalarization.ScenarioRun.runWith;
  * @author ruslan
  *         created 09/02/16 at 20:11
  */
-public class FixedSizeObjectAllocator extends AllocationScenario {
+public class ControlFlowScenario extends AllocationScenario {
 
 	private static final Type USE_TYPE = Type.valueOf(
 			System.getProperty( "scenario.use-type", Type.ALLOCATE_ONCE.name() )

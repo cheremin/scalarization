@@ -9,10 +9,10 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @author ruslan
  *         created 29/03/16 at 22:04
  */
-public class DuplicatingOutputStream extends OutputStream {
+public class MultiplexingOutputStream extends OutputStream {
 	private final OutputStream[] delegates;
 
-	public DuplicatingOutputStream( final OutputStream... delegates ) {
+	public MultiplexingOutputStream( final OutputStream... delegates ) {
 		checkArgument( delegates != null, "delegates can't be null" );
 		this.delegates = delegates;
 	}
@@ -47,6 +47,8 @@ public class DuplicatingOutputStream extends OutputStream {
 
 	@Override
 	public void close() throws IOException {
-		//intentionally do nothing
+		for( final OutputStream delegate : delegates ) {
+			delegate.close();
+		}
 	}
 }

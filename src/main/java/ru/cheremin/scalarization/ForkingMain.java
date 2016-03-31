@@ -2,25 +2,25 @@ package ru.cheremin.scalarization;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import com.google.common.io.ByteSink;
+import com.google.common.io.Files;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
 import ru.cheremin.scalarization.infra.AllocationBenchmarkMain;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedFlag;
-import ru.cheremin.scalarization.infra.JvmArg.SystemProperty;
-import ru.cheremin.scalarization.infra.JvmProcessBuilder;
-import ru.cheremin.scalarization.infra.ScenarioRunArgs;
+import ru.cheremin.scalarization.infra.MultiplexingOutputStream;
+import ru.cheremin.scalarization.infra.ScenarioRunner;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-
-import static java.lang.ProcessBuilder.Redirect.PIPE;
 
 /**
  * @author ruslan
@@ -65,67 +65,28 @@ public class ForkingMain {
 
 	}
 
-	private static void runScenario( final Class<? extends AllocationScenario> scenarioClass ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, InterruptedException {
-		//just to check class have 0-arg ctor and can be cast to AllocationScenario
-		final AllocationScenario scenario = scenarioClass.newInstance();
+	private static void runScenario( final Class<? extends AllocationScenario> scenarioClass ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, InterruptedException, ExecutionException {
 
-
-		final List<ScenarioRun> scenarioRuns = extractScenarioSpecificArgs( scenarioClass );
-
-		if( scenarioRuns.isEmpty() ) {
-			System.out.printf( "Running %s: x 1 run (@ScenarioRunArgs not found) \n", scenarioClass.getCanonicalName() );
-		} else {
-			System.out.printf( "Running %s: x %d runs (@ScenarioRunArgs found) \n",
-			                   scenarioClass.getCanonicalName(),
-			                   scenarioRuns.size()
-			);
-		}
-
-		final JvmProcessBuilder currentJvm = JvmProcessBuilder
-				.copyCurrentJvm()
-				.appendArgOverriding( new SystemProperty( AllocationBenchmarkMain.SCENARIO_CLASS_KEY, scenarioClass.getCanonicalName() ) )
-				.withMainClass( AllocationBenchmarkMain.class );
-
-
-		// redirect output into file <ClassName>.result
 		final File scenarioOutputFile = new File(
 				TARGET_DIRECTORY,
 				scenarioClass.getCanonicalName()
 		);
-		//TODO RC: it's better to duplicate output to console and to file
-		//      also it worth to append run params to file, because not all of them
-		//      (e.g. extended JVM args) are now available inside
-		if( scenarioRuns.isEmpty() ) {
-			for( final ScenarioRun staticRun : STATIC_RUN_ARGS ) {
-				final JvmProcessBuilder jvmWithStaticArgs = currentJvm.appendArgsOverriding( staticRun.getJvmArgs() );
-				System.out.println( "Single run with " + staticRun );
-				final List<String> forkedJvmCmd = jvmWithStaticArgs.buildJvmCommandLine();
-				final Process process = new ProcessBuilder( forkedJvmCmd )
-//						.redirectOutput( appendTo( scenarioOutputFile ) )
-						.redirectOutput( PIPE )
-						.inheritIO()
-						.start();
-				//TODO process pumper, redirect stream and wait for process to finish
-//				new StreamPumper(process.getInputStream(), )
 
-				process.waitFor();
-			}
-		} else {
-			for( final ScenarioRun scenarioRun : scenarioRuns ) {
-				final JvmProcessBuilder scenarioJvm = currentJvm.appendArgsOverriding( scenarioRun.getJvmArgs() );
-				for( final ScenarioRun staticRun : STATIC_RUN_ARGS ) {
-					System.out.println( "Repeating run with " + staticRun + " x " + scenarioRun );
-					final JvmProcessBuilder scenarioStaticJvm = scenarioJvm.appendArgsOverriding( staticRun.getJvmArgs() );
-
-					final List<String> forkedJvmCmd = scenarioStaticJvm.buildJvmCommandLine();
-					final Process process = new ProcessBuilder( forkedJvmCmd )
-//							.redirectOutput( appendTo( scenarioOutputFile ) )
-							.inheritIO()
-							.start();
-					process.waitFor();
+		final ScenarioRunner scenarioRunner = new ScenarioRunner(
+				scenarioClass,
+				new ByteSink() {
+					@Override
+					public OutputStream openStream() throws IOException {
+						final ByteSink fileSink = Files.asByteSink( scenarioOutputFile );
+						return new MultiplexingOutputStream(
+								System.out,
+								fileSink.openStream()
+						);
+					}
 				}
-			}
-		}
+		);
+
+		scenarioRunner.run();
 	}
 
 	private static List<Class<? extends AllocationScenario>> lookupScenarios( final String autodiscoverAllScenariosIn ) {
@@ -142,19 +103,4 @@ public class ForkingMain {
 		} );
 		return allocationScenarioClasses;
 	}
-
-	private static List<ScenarioRun> extractScenarioSpecificArgs( final Class<?> clazz ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		for( final Method method : clazz.getMethods() ) {
-			if( method.getAnnotation( ScenarioRunArgs.class ) != null
-					&& Modifier.isStatic( method.getModifiers() )
-					&& Modifier.isPublic( method.getModifiers() )
-					&& method.getParameterTypes().length == 0
-					&& List.class.isAssignableFrom( method.getReturnType() ) ) {
-				return ( List<ScenarioRun> ) method.invoke( null );
-			}
-
-		}
-		return Collections.EMPTY_LIST;
-	}
-
 }
