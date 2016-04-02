@@ -16,7 +16,7 @@ public class NewFinalizableScenario extends AllocationScenario {
 	private final StringKeysGenerator generator = randomKeysGenerator( SIZE );
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final String name = generator.next();
 		final OverridesFinalize object = new OverridesFinalize( name );
 		return object.name.length();

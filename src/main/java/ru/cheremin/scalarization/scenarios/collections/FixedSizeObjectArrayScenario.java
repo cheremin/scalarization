@@ -3,9 +3,11 @@ package ru.cheremin.scalarization.scenarios.collections;
 import java.util.*;
 
 import ru.cheremin.scalarization.ScenarioRun;
+import ru.cheremin.scalarization.infra.JvmArg;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
+import static java.util.Arrays.asList;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
@@ -13,20 +15,29 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * Only array of size 1 is scalarized with 1.8. Array of size >=2 is not scalarized
  * <p/>
  * TODO RC: random index array access
+ * <p/>
  * TODO RC: check array of size 0 (with .getClass())
+ * <p/>
+ * TODO RC: with full 64b pointers (i.e. without compressed oops) it must be up
+ * to TrackedInitializationLimit=50?
+ * <p/>
+ * TODO RC: try fill with .arraycopy (seems like .arraycopy specifically annotated for
+ * EA?)
  *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
-public class FixedSizeObjectArrayAllocator extends AllocationScenario {
+public class FixedSizeObjectArrayScenario extends AllocationScenario {
 	private static final String VECTORIZED_ACCESS_KEY = "scenario.vectorized-array-access";
 	private static final boolean VECTORIZED = Boolean.getBoolean( VECTORIZED_ACCESS_KEY );
 
+	private static final Integer ONE = Integer.valueOf( 1 );
+
 	@Override
-	public long allocate() {
+	public long run() {
 		final Integer[] array = new Integer[SIZE];
-		//TODO RC: fill with .arraycopy
-		fill( array, 1 );
+
+		fill( array, ONE );
 
 		final long sum = sum( array );
 
@@ -34,10 +45,10 @@ public class FixedSizeObjectArrayAllocator extends AllocationScenario {
 	}
 
 
-	private static long sum( final Number[] array ) {
+	private static long sum( final Integer[] array ) {
 		long sum = 0;
 		if( VECTORIZED ) {
-			for( final Number b : array ) {
+			for( final Integer b : array ) {
 				sum += b.longValue();
 			}
 		} else {
@@ -83,8 +94,8 @@ public class FixedSizeObjectArrayAllocator extends AllocationScenario {
 		return sum;
 	}
 
-	private static <T> void fill( final T[] array,
-	                              final T value ) {
+	private static void fill( final Integer[] array,
+	                          final Integer value ) {
 		if( VECTORIZED ) {
 			for( int i = 0; i < array.length; i++ ) {
 				array[i] = value;
@@ -139,8 +150,12 @@ public class FixedSizeObjectArrayAllocator extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SIZE_KEY, 0, 1, 2, /*4, 8, 16, */ 64, 65 ),
-				allOf( VECTORIZED_ACCESS_KEY, true, false )
+				allOf( SIZE_KEY, 0, 1, 2, 50, 51, 64, 65 ),
+				allOf( VECTORIZED_ACCESS_KEY, true, false ),
+				asList(
+						new JvmArg.JvmExtendedFlag( "UseCompressedOops", true ),
+						new JvmArg.JvmExtendedFlag( "UseCompressedOops", false )
+				)
 		);
 	}
 

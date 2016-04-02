@@ -44,7 +44,7 @@ public class POLambdaScenario extends AllocationScenario {
 
 	//TODO use more sophisticated lambda impl
 	@Override
-	public long allocate() {
+	public long run() {
 		final SumLength lambda = new SumLength();
 		BOX_TYPE.apply( this, new SumLength() );
 		return lambda.sum + PADDER.value();

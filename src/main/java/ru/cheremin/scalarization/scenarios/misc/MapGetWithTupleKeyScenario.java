@@ -99,7 +99,7 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final boolean successful = ( rnd.nextDouble() <= SUCCESSFUL_LOOKUPS_PROBABILITY );
 		final String key1;
 		final String key2;

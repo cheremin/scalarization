@@ -21,7 +21,7 @@ public class HashCodeBuilderScenario extends AllocationScenario {
 
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final HashCodeBuilder builder = new HashCodeBuilder();
 		for( final String key : keys ) {
 			builder.append( key );

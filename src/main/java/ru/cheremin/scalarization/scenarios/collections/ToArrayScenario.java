@@ -28,7 +28,7 @@ public class ToArrayScenario extends AllocationScenario {
 	private final ArrayList<String> stringsList = Lists.newArrayList( generateStringArray( SIZE ) );
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final String[] stringsArray = new String[SIZE];
 		toArray( stringsList, stringsArray );
 //		stringsList.toArray( stringsArray );

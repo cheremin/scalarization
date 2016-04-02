@@ -16,7 +16,7 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
 public class SmallArrayListScenario extends AllocationScenario {
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final ArrayList list = new ArrayList( SIZE );
 		for( int i = 0; i < SIZE; i++ ) {
 			list.add( "" );

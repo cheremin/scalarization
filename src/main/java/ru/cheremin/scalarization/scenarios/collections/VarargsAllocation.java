@@ -10,7 +10,7 @@ import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
  * <p/>
  * If access is going via looping -- array scalarized only for 1 element
  *
- * @see FixedSizeObjectArrayAllocator
+ * @see FixedSizeObjectArrayScenario
  * @author ruslan
  *         created 09/02/16 at 13:19
  */
@@ -18,7 +18,7 @@ public class VarargsAllocation extends AllocationScenario {
 	private final StringKeysGenerator keys = Utils.randomKeysGenerator( 1024 );
 
 	@Override
-	public long allocate() {
+	public long run() {
 //		final String[] args = new String[SIZE];
 //		for( int i = 0; i < args.length; i++ ) {
 //			args[i] = nextKey();

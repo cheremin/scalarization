@@ -19,7 +19,7 @@ public class EnumValuesIterateAllocator extends AllocationScenario {
 	//TODO RC: generate enum class of appropriate size on the fly, with byte-code-gen
 
 	@Override
-	public long allocate() {
+	public long run() {
 		switch( SIZE ) {
 			case 1: {
 				final Enum1[] values = Enum1.values();

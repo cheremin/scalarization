@@ -28,7 +28,7 @@ public class IterateCollectionScenario extends AllocationScenario {
 	public Collection<Integer> collection = COLLECTION_TYPE.create();
 
 	@Override
-	public long allocate() {
+	public long run() {
 		return iterate( collection );
 	}
 

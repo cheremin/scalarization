@@ -37,7 +37,7 @@ public class ObjectyStaffScenario extends AllocationScenario {
 
 
 	@Override
-	public long allocate() {
+	public long run() {
 		switch( USE_TYPE ) {
 			case OBJECT_HASH_CODE: {
 				return objectHashCode();

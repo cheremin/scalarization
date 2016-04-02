@@ -9,7 +9,7 @@ public abstract class AllocationScenario {
 
 	public static final int SIZE = Integer.getInteger( SIZE_KEY, 16 );
 
-	public abstract long allocate();
+	public abstract long run();
 
 	public String additionalInfo() {
 		return "";

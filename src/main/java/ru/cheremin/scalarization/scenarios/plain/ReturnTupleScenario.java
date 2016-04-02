@@ -21,7 +21,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 	private final StringKeysGenerator generator = randomKeysGenerator( 1024 );
 
 	@Override
-	public long allocate() {
+	public long run() {
 
 		final Tuple2<String> tuple = createTuple2(
 				generator.next(),

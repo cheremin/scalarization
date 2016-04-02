@@ -29,9 +29,10 @@ public class AllocationBenchmarkMain {
 
 	/**
 	 * Bytes allocated in {@linkplain ThreadMXBean#getThreadAllocatedBytes(long)}for
-	 * 2 long[1] arrays
+	 * 2 long[1] arrays. Exact value can be in range [48..64], depends on arch(32/64)
+	 * and compressedOops usage, so I use max
 	 */
-	private static final int INFRASTRUCTURE_ALLOCATION_BYTES = 48;
+	private static final int INFRASTRUCTURE_ALLOCATION_BYTES = 64;
 
 
 	public static void main( final String[] args ) throws Exception {
@@ -92,7 +93,7 @@ public class AllocationBenchmarkMain {
 		for( final long startedAt = System.currentTimeMillis();
 		     System.currentTimeMillis() - startedAt < maxTimeMs; ) {
 			for( int i = 0; i < ITERATIONS_IN_BATCH; i++ ) {
-				sum += scenario.allocate();
+				sum += scenario.run();
 			}
 			totalIterations += ITERATIONS_IN_BATCH;
 		}
@@ -115,18 +116,26 @@ public class AllocationBenchmarkMain {
 		}
 		for( int i = 0; i < results.length; i++ ) {
 			final BenchmarkResult result = results[i];
-			final boolean noAllocations =
-					result.gcCollectionCount == 0
-							&& result.gcCollectionTime == 0
-							&& ( result.memoryAllocatedByThreadBytes <= INFRASTRUCTURE_ALLOCATION_BYTES );
+			final double bytesAllocatedPerRun = 1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations;
+			final String shortDescription;
+			if( result.gcCollectionCount == 0
+					&& result.gcCollectionTime == 0
+					&& ( result.memoryAllocatedByThreadBytes <= INFRASTRUCTURE_ALLOCATION_BYTES ) ) {
+				shortDescription = "NO_ALLOCATIONS";
+			} else if( bytesAllocatedPerRun < 1 ) {
+				shortDescription = "likely NO_ALLOCATIONS";
+			} else {
+				shortDescription = "ARE_ALLOCATIONS";
+			}
+
 			if( CSV_OUTPUT ) {
 				System.out.printf(
 						"%d, %s, %d, %d, %.2f, %d , %d , %d \n",
 						i,
-						( noAllocations ? "likely NO_ALLOCATIONS" : "likely ARE_ALLOCATIONS" ),
+						shortDescription,
 						result.memoryAllocatedByThreadBytes,
 						result.totalIterations,
-						1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations,
+						bytesAllocatedPerRun,
 						result.gcCollectionCount,
 						result.gcCollectionTime,
 						result.benchmarkResult
@@ -135,10 +144,10 @@ public class AllocationBenchmarkMain {
 				System.out.printf(
 						"run[#%d]: %s. (Details: allocated %d bytes/%d iterations ~= %.2f bytes/iteration, %d GCs %d ms in total, 'result' = %d) \n",
 						i,
-						( noAllocations ? "likely NO_ALLOCATIONS" : "likely ARE_ALLOCATIONS" ),
+						shortDescription,
 						result.memoryAllocatedByThreadBytes,
 						result.totalIterations,
-						1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations,
+						bytesAllocatedPerRun,
 						result.gcCollectionCount,
 						result.gcCollectionTime,
 						result.benchmarkResult

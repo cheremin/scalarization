@@ -10,7 +10,7 @@ public class DummyScenario extends AllocationScenario {
 	public int dummy;
 
 	@Override
-	public long allocate() {
+	public long run() {
 		return dummy++;
 	}
 }

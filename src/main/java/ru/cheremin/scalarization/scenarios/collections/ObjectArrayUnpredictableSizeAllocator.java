@@ -17,7 +17,7 @@ import static ru.cheremin.scalarization.ScenarioRun.runForAll;
 public class ObjectArrayUnpredictableSizeAllocator extends AllocationScenario {
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
 		final String[] array = new String[rnd.nextInt( SIZE )];

@@ -58,9 +58,12 @@ public class ForkingMain {
 					runScenario( allocationScenarioClass );
 				}
 			}
-		} else {
+		} else if( SCENARIO_CLASS_NAME != null ) {
 			final Class<?> clazz = Class.forName( SCENARIO_CLASS_NAME );
 			runScenario( ( Class<AllocationScenario> ) clazz );
+		} else {
+			System.err.println( "'scenario.auto-discover-in' or 'scenario' must be set" );
+			System.exit( -1 );
 		}
 
 	}

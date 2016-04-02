@@ -20,7 +20,7 @@ public class ArrayAsListScenario extends AllocationScenario {
 	private final String[] array = generateStringArray( SIZE );
 
 	@Override
-	public long allocate() {
+	public long run() {
 		int sum = 0;
 		//TODO RC: somehow it is not scalarized! Why?
 		//TODO but there are difference between +/- EA: 56 bytes/run vs 24 bytes/run

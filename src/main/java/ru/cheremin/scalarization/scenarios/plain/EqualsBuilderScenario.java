@@ -43,7 +43,7 @@ public class EqualsBuilderScenario extends AllocationScenario {
 
 
 	@Override
-	public long allocate() {
+	public long run() {
 		return BUILDER_TYPE.runWithKeys( keys );
 	}
 

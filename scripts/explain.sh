@@ -1,7 +1,7 @@
 SCENARIO=$1
 SIZE=$2
 
-#-XX:+PrintInlining -XX:CompileCommand="print ru/cheremin/scalarization/scenarios/$SCENARIO allocate"
+#-XX:+PrintInlining -XX:CompileCommand="print ru/cheremin/scalarization/scenarios/$SCENARIO run"
 JAVA_OPTS="$JAVA_OPTS \
 	-Xmx64m -Xms64m -XX:+UseSerialGC -XX:+UnlockDiagnosticVMOptions \
 	-XX:+DoEscapeAnalysis -XX:BCEATraceLevel=3 -XX:+PrintEscapeAnalysis -XX:+Verbose"

@@ -37,7 +37,7 @@ public class ControlFlowScenario extends AllocationScenario {
 	);
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
 		switch( USE_TYPE ) {

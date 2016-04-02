@@ -30,7 +30,7 @@ public class GetHashCodeScenario extends AllocationScenario {
 
 
 	@Override
-	public long allocate() {
+	public long run() {
 		final String key1 = keysGenerator.next();
 		final String key2 = keysGenerator.next();
 
