@@ -27,7 +27,7 @@ public class SmallArrayListScenario extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		return ScenarioRun.runForAll(
+		return ScenarioRun.runWithAll(
 				SIZE_KEY, 0, 1, 2, 4
 		);
 	}

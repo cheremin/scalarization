@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 
 import com.sun.management.GarbageCollectorMXBean;
 import com.sun.management.ThreadMXBean;
+import org.apache.commons.lang3.StringUtils;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 
@@ -36,6 +37,11 @@ public class AllocationBenchmarkMain {
 
 
 	public static void main( final String[] args ) throws Exception {
+		if( StringUtils.isEmpty( SCENARIO_CLASS_NAME ) ) {
+			System.err.println( "-D" + SCENARIO_CLASS_KEY + " must be set to name of scenario class" );
+			System.exit( -1 );
+		}
+
 		final Class<?> clazz = Class.forName( SCENARIO_CLASS_NAME );
 		final AllocationScenario scenario = ( AllocationScenario ) clazz.newInstance();
 
@@ -116,7 +122,7 @@ public class AllocationBenchmarkMain {
 		}
 		for( int i = 0; i < results.length; i++ ) {
 			final BenchmarkResult result = results[i];
-			final double bytesAllocatedPerRun = 1.0 * ( result.memoryAllocatedByThreadBytes - INFRASTRUCTURE_ALLOCATION_BYTES ) / result.totalIterations;
+			final double bytesAllocatedPerRun = 1.0 * ( result.memoryAllocatedByThreadBytes ) / result.totalIterations;
 			final String shortDescription;
 			if( result.gcCollectionCount == 0
 					&& result.gcCollectionTime == 0

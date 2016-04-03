@@ -8,7 +8,7 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.ScenarioRun.runForAll;
+import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
 
 /**
  * @author ruslan
@@ -27,6 +27,6 @@ public class ObjectArrayUnpredictableSizeAllocator extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		return runForAll( SIZE_KEY, 0, 1, 2, 16 /*, 64, 65*/ );
+		return runWithAll( SIZE_KEY, 0, 1, 2, 16 /*, 64, 65*/ );
 	}
 }

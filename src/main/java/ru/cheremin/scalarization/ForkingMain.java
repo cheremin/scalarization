@@ -35,7 +35,7 @@ public class ForkingMain {
 	public static final File TARGET_DIRECTORY = new File( System.getProperty( "target-directory", "results" ) );
 
 
-	private static final ScenarioRun[] STATIC_RUN_ARGS = {
+	private static final ScenarioRun[] EXTENDED_RUN_PARAMETERS = {
 			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", true ) ),
 			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", false ) )
 			//TODO: add -server/-client?
@@ -86,7 +86,8 @@ public class ForkingMain {
 								fileSink.openStream()
 						);
 					}
-				}
+				},
+				EXTENDED_RUN_PARAMETERS
 		);
 
 		scenarioRunner.run();

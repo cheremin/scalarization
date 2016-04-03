@@ -91,7 +91,10 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 		long sum = 0;
 		//manual loop unrolling
 		switch( array.length ) {
+			case 64:
+				sum += array[63];
 			default:
+				//RC: I'm too lazy to fill all
 			case 16:
 				sum += array[15];
 			case 15:
@@ -142,7 +145,10 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 		int sum = 0;
 		//manual loop unrolling
 		switch( array.length ) {
+			case 64:
+				sum += array[63];
 			default:
+				//RC: I'm too lazy to fill all
 			case 16:
 				sum += array[15];
 			case 15:
@@ -211,7 +217,10 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 	                                 final long value ) {
 		//manual loop unrolling
 		switch( array.length ) {
+			case 64:
+				array[63] = value;
 			default:
+				//RC: I'm too lazy to fill all
 			case 16:
 				array[15] = value;
 			case 15:
@@ -260,7 +269,10 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 	                                 final int value ) {
 		//manual loop unrolling
 		switch( array.length ) {
+			case 64:
+				array[63] = value;
 			default:
+				//RC: I'm too lazy to fill all
 			case 16:
 				array[15] = value;
 			case 15:

@@ -7,7 +7,7 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.ScenarioRun.runForAll;
+import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
 import static ru.cheremin.scalarization.scenarios.Utils.generateStringArray;
 
 /**
@@ -44,6 +44,6 @@ public class ToArrayScenario extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		return runForAll( SIZE_KEY, 0, 1, 2 );
+		return runWithAll( SIZE_KEY, 0, 1, 2 );
 	}
 }

@@ -57,8 +57,8 @@ public class ScenarioRun {
 		);
 	}
 
-	public static List<ScenarioRun> runForAll( final String propertyName,
-	                                           final Object... propertyValues ) {
+	public static List<ScenarioRun> runWithAll( final String propertyName,
+	                                            final Object... propertyValues ) {
 		return Lists.newArrayList(
 				Lists.transform(
 						allOf( propertyName, propertyValues ),

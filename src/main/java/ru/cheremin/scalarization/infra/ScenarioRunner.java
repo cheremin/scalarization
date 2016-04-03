@@ -21,16 +21,20 @@ import static ru.cheremin.scalarization.infra.AllocationBenchmarkMain.SCENARIO_C
  *         created 31/03/16 at 00:50
  */
 public class ScenarioRunner {
-	private final ScenarioRun[] extendedRunArguments = {
-			new ScenarioRun( new JvmArg.JvmExtendedFlag( "DoEscapeAnalysis", true ) ),
-			new ScenarioRun( new JvmArg.JvmExtendedFlag( "DoEscapeAnalysis", false ) )
+	private static final Predicate<JvmArg> AGENTLIB = new Predicate<JvmArg>() {
+		@Override
+		public boolean apply( final JvmArg arg ) {
+			return arg.name().contains( "agentlib" );
+		}
 	};
+	private final ScenarioRun[] extendedRunArguments;
 
 	private final Class<? extends AllocationScenario> scenarioClass;
 	private final ByteSink reportTo;
 
 	public ScenarioRunner( final Class<? extends AllocationScenario> scenarioClass,
-	                       final ByteSink reportTo ) throws IllegalAccessException, InstantiationException {
+	                       final ByteSink reportTo,
+	                       final ScenarioRun[] extendedRunArguments ) throws IllegalAccessException, InstantiationException {
 		checkArgument( scenarioClass != null, "scenarioClass can't be null" );
 		checkArgument( reportTo != null, "reportTo can't be null" );
 		//just to check class have 0-arg ctor and can be cast to AllocationScenario
@@ -39,10 +43,11 @@ public class ScenarioRunner {
 
 		this.scenarioClass = scenarioClass;
 		this.reportTo = reportTo;
+		this.extendedRunArguments = extendedRunArguments;
 	}
 
 	public void run() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, IOException, InterruptedException, ExecutionException {
-		final ExecutorService executor = Executors.newFixedThreadPool( 2 /*stdout+stderr*/ );
+		final ExecutorService executor = Executors.newFixedThreadPool( 1 /*stdout+stderr*/ );
 
 		try (PrintStream out = new PrintStream( reportTo.openBufferedStream() )) {
 
@@ -60,12 +65,7 @@ public class ScenarioRunner {
 			final JvmProcessBuilder currentJvm = JvmProcessBuilder
 					.copyCurrentJvm()
 					.appendArgOverriding( new SystemProperty( SCENARIO_CLASS_KEY, scenarioClass.getCanonicalName() ) )
-					.removeArg( new Predicate<JvmArg>() {
-						@Override
-						public boolean apply( final JvmArg arg ) {
-							return arg.name().contains( "agentlib" );
-						}
-					} )
+					.removeArg( AGENTLIB /*can't debug 2 JVMs with same settings */ )
 					.withMainClass( AllocationBenchmarkMain.class );
 
 
