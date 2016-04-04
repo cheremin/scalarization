@@ -13,8 +13,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.io.ByteSink;
 import com.google.common.io.Files;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
 import ru.cheremin.scalarization.infra.AllocationBenchmarkMain;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedFlag;
@@ -23,12 +21,11 @@ import ru.cheremin.scalarization.infra.ScenarioRunner;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
+ *
  * @author ruslan
  *         created 23/02/16 at 19:41
  */
 public class ForkingMain {
-	private static final Log log = LogFactory.getLog( ForkingMain.class );
-
 	public static final String SCENARIO_CLASS_NAME = AllocationBenchmarkMain.SCENARIO_CLASS_NAME;
 	public static final String AUTODISCOVER_ALL_SCENARIOS_IN = System.getProperty( "scenario.auto-discover-in", null );
 
@@ -41,6 +38,20 @@ public class ForkingMain {
 			//TODO: add -server/-client?
 	};
 
+	/**
+	 * Parameters are passed via system properties:
+	 * <p/>
+	 * -Dscenario = [className extends AllocationScenario] -- profile single class
+	 * <p/>
+	 * -Dscenario.auto-discover-in = [class name pattern]  -- profile all scenarios
+	 * matched with pattern
+	 * <p/>
+	 * -Dtarget-directory = [path]                         -- store results in files
+	 * in the directory. Files are created one-per-scenario. (Output also duplicated
+	 * to stdout)
+	 *
+	 * All parameters passed to JVM will be copied and used to start forked JVM
+	 */
 	public static void main( final String[] args ) throws Exception {
 		if( !TARGET_DIRECTORY.exists() ) {
 			TARGET_DIRECTORY.mkdirs();
@@ -97,7 +108,7 @@ public class ForkingMain {
 		final Reflections reflections = new Reflections( autodiscoverAllScenariosIn );
 		final List<Class<? extends AllocationScenario>> allocationScenarioClasses =
 				Lists.newArrayList( reflections.getSubTypesOf( AllocationScenario.class ) );
-		//sort to have stable order
+		//sort just to have stable order
 		Collections.sort( allocationScenarioClasses, new Ordering<Class<? extends AllocationScenario>>() {
 			@Override
 			public int compare( final Class<? extends AllocationScenario> left,
