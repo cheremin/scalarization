@@ -9,6 +9,7 @@ import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 import static ru.cheremin.scalarization.ScenarioRun.runWith;
+import static ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario.Vector2D.randomVector;
 
 /**
  * Check simple Vector2D arithmetic in different scenarios
@@ -59,28 +60,23 @@ public class ControlFlowScenario extends AllocationScenario {
 	}
 
 	private long allocateOnce( final ThreadLocalRandom rnd ) {
-		return ( long ) new Vector2D( rnd.nextDouble(), 3.8 )
-				.add( new Vector2D( 1.5, 3.4 ) )
-				.dot( new Vector2D( 1.9, 14.3 ) );
+		final Vector2D v1 = randomVector( rnd );
+		final Vector2D v2 = randomVector( rnd );
+		final Vector2D v3 = randomVector( rnd );
+		return ( long ) v1.add( v2 ).dot( v3 );
 	}
 
 	private long allocateInLoop( final ThreadLocalRandom rnd ) {
-		final Vector2D v = new Vector2D(
-				rnd.nextDouble(),
-				rnd.nextDouble()
-		);
+		final Vector2D v = randomVector( rnd );
 		for( int i = 0; i < SIZE; i++ ) {
-			final Vector2D addition = new Vector2D( i, i * 2 );
+			final Vector2D addition = randomVector( rnd );
 			v.addAccumulate( addition );
 		}
 		return ( long ) v.length();
 	}
 
 	private long replaceReferenceInLoop( final ThreadLocalRandom rnd ) {
-		Vector2D v = new Vector2D(
-				rnd.nextDouble(),
-				rnd.nextDouble()
-		);
+		Vector2D v = randomVector( rnd );
 		//RC: we replace reference, this confuses EA because it is hard to prove
 		// which object v refer to
 		for( int i = 0; i < SIZE; i++ ) {
@@ -95,15 +91,9 @@ public class ControlFlowScenario extends AllocationScenario {
 		// and this prevents EA to prove v can be scalarized
 		final Vector2D v;
 		if( rnd.nextBoolean() ) {
-			v = new Vector2D(
-					1,
-					rnd.nextDouble()
-			);
+			v = new Vector2D( 1, rnd.nextDouble() );
 		} else {
-			v = new Vector2D(
-					rnd.nextDouble(),
-					1
-			);
+			v = new Vector2D( rnd.nextDouble(), 1 );
 		}
 
 		return ( long ) v.length();
@@ -112,24 +102,17 @@ public class ControlFlowScenario extends AllocationScenario {
 	private long allocateUnConditionally( final ThreadLocalRandom rnd ) {
 		//RC: and this one IS scalarized
 		if( rnd.nextBoolean() ) {
-			final Vector2D v = new Vector2D(
-					1,
-					rnd.nextDouble()
-			);
+			final Vector2D v = new Vector2D( 1, rnd.nextDouble() );
 			return ( long ) v.length();
 		} else {
-			final Vector2D v = new Vector2D(
-					rnd.nextDouble(),
-					1
-			);
+			final Vector2D v = new Vector2D( rnd.nextDouble(), 1 );
 			return ( long ) v.length();
 		}
 	}
 
 	private long allocateUnConditionally2( final ThreadLocalRandom rnd ) {
 		//RC: this one IS also scalarized
-		final double x;
-		final double y;
+		final double x, y;
 		if( rnd.nextBoolean() ) {
 			x = 1;
 			y = rnd.nextDouble();
@@ -150,6 +133,13 @@ public class ControlFlowScenario extends AllocationScenario {
 	public static final class Vector2D {
 		private double x;
 		private double y;
+
+		public static Vector2D randomVector( final ThreadLocalRandom rnd ) {
+			return new Vector2D(
+					rnd.nextDouble(),
+					rnd.nextDouble()
+			);
+		}
 
 		public Vector2D( final double x,
 		                 final double y ) {
