@@ -15,24 +15,24 @@ public class Utils {
 		return keys;
 	}
 
-	public static StringKeysGenerator randomKeysGenerator( final int universeSize ) {
-		final String[] keys = generateStringArray( universeSize );
-		return new StringKeysGenerator( keys );
+	public static StringsPool randomStringsPool( final int universeSize ) {
+		final String[] strings = generateStringArray( universeSize );
+		return new StringsPool( strings );
 	}
 
-	public static class StringKeysGenerator {
-		private final String[] keys;
+	public static class StringsPool {
+		private final String[] strings;
 
-		public StringKeysGenerator( final String[] keys ) {
-			checkArgument( keys != null, "keys can't be null" );
-			this.keys = keys;
+		public StringsPool( final String[] strings ) {
+			checkArgument( strings != null, "strings can't be null" );
+			this.strings = strings;
 		}
 
 		private int index = 0;
 
 		public String next() {
-			index = ( index + 1 ) % keys.length;
-			return keys[index];
+			index = ( index + 1 ) % strings.length;
+			return strings[index];
 		}
 	}
 

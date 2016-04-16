@@ -26,7 +26,7 @@ import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
  *         created 09/02/16 at 23:51
  */
 public class GetHashCodeScenario extends AllocationScenario {
-	private final Utils.StringKeysGenerator keysGenerator = Utils.randomKeysGenerator( 1024 );
+	private final Utils.StringsPool keysGenerator = Utils.randomStringsPool( 1024 );
 
 
 	@Override

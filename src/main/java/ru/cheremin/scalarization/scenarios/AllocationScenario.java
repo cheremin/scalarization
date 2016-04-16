@@ -22,7 +22,7 @@ public abstract class AllocationScenario {
 		if( SIZE < 0 ) {
 			result = getClass().getSimpleName();
 		} else {
-			result = String.format( "%s[size:%d]", getClass().getSimpleName(), SIZE );
+			result = String.format( "%s[SIZE:%d]", getClass().getSimpleName(), SIZE );
 		}
 		final String additionalInfo = additionalInfo();
 

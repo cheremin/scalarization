@@ -2,7 +2,7 @@ package ru.cheremin.scalarization.scenarios.collections;
 
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
-import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
+import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
 
 /**
  * But for Object[]/int[] size <= 64! (see <a href="http://www.javaspecialists.eu/archive/Issue179.html">link</a>)
@@ -15,7 +15,7 @@ import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
  *         created 09/02/16 at 13:19
  */
 public class VarargsAllocation extends AllocationScenario {
-	private final StringKeysGenerator keys = Utils.randomKeysGenerator( 1024 );
+	private final StringsPool keys = Utils.randomStringsPool( 1024 );
 
 	@Override
 	public long run() {

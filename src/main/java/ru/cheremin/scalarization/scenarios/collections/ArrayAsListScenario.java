@@ -14,7 +14,8 @@ import static ru.cheremin.scalarization.scenarios.Utils.generateStringArray;
 /**
  * Check is Arrays.asList(array) scalarized (only wrapper, not wrapped array itself).
  * <p/>
- * With 1.7/1.8 index access is scalarized, but iterator access is not.Reasons are unknown.
+ * With 1.7/1.8 index access is scalarized, but iterator access is not. Reasons are
+ * unknown.
  * <p/>
  * Moreover, there is a difference in memory allocations between +/- EA, so it looks
  * like _iterators_ are scalarized, but list itself is not...
@@ -52,8 +53,8 @@ public class ArrayAsListScenario extends AllocationScenario {
 		return sumWithIndex( list );
 	}
 
-	private int sumWithIndex( final List<String> list ) {
-		int sum = 0;
+	private long sumWithIndex( final List<String> list ) {
+		long sum = 0;
 		for( int i = 0; i < list.size(); i++ ) {
 			final String s = list.get( i );
 			sum += s.length();
@@ -66,8 +67,8 @@ public class ArrayAsListScenario extends AllocationScenario {
 		return sumWithIterator( list );
 	}
 
-	private int sumWithIterator( final List<String> list ) {
-		int sum = 0;
+	private long sumWithIterator( final List<String> list ) {
+		long sum = 0;
 		final Iterator<String> i = list.iterator();
 		while( i.hasNext() ) {
 			final String s = i.next();
@@ -79,7 +80,6 @@ public class ArrayAsListScenario extends AllocationScenario {
 	public enum IterationType {
 		WITH_INDEX,
 		WITH_ITERATOR
-
 	}
 
 	@Override

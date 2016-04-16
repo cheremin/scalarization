@@ -6,9 +6,9 @@ import java.util.concurrent.Callable;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
+import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
 
-import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
+import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
 /**
  * In original paper (Choi99) there was a simplification which conservatively assumes
@@ -19,7 +19,7 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
  *         created 10/02/16 at 15:11
  */
 public class NewRunnableScenario extends AllocationScenario {
-	private final StringKeysGenerator generator = randomKeysGenerator( 1024 );
+	private final StringsPool generator = randomStringsPool( 1024 );
 
 	@Override
 	public long run() {

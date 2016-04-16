@@ -10,7 +10,6 @@ import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedProperty;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
-import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
 
 import static java.util.Arrays.asList;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
@@ -58,7 +57,7 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 			System.getProperty( MAP_TYPE_KEY, MapType.HASH_MAP.name() )
 	);
 
-	private final StringKeysGenerator keys = Utils.randomKeysGenerator( 1024 );
+	private final Utils.StringsPool keys = Utils.randomStringsPool( 1024 );
 
 	private final Map<StringKey, String> map;
 	private final SimplestMap<StringKey, String> simplestMap;

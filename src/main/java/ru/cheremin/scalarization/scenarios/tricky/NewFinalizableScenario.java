@@ -1,9 +1,9 @@
 package ru.cheremin.scalarization.scenarios.tricky;
 
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
+import ru.cheremin.scalarization.scenarios.Utils;
 
-import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
+import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
 /**
  * Objects with non-default .finalize()-ers are treated conservatively, and
@@ -13,7 +13,7 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
  *         created 10/02/16 at 15:11
  */
 public class NewFinalizableScenario extends AllocationScenario {
-	private final StringKeysGenerator generator = randomKeysGenerator( SIZE );
+	private final Utils.StringsPool generator = randomStringsPool( SIZE );
 
 	@Override
 	public long run() {

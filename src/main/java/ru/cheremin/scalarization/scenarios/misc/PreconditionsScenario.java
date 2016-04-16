@@ -6,12 +6,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils.StringKeysGenerator;
+import ru.cheremin.scalarization.scenarios.Utils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
-import static ru.cheremin.scalarization.scenarios.Utils.randomKeysGenerator;
+import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
 /**
  * java1.7: It seems like varargs-array scalarized perfectly fine for sizes 1..4, but
@@ -33,7 +33,7 @@ public class PreconditionsScenario extends AllocationScenario {
 			System.getProperty( CHECK_FAILED_PROBABILITY_KEY, "1e-5" )
 	);
 
-	private final StringKeysGenerator args = randomKeysGenerator( 1024 );
+	private final Utils.StringsPool args = randomStringsPool( 1024 );
 
 	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
