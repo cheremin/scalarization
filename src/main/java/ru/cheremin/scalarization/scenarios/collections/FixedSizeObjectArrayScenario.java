@@ -3,23 +3,34 @@ package ru.cheremin.scalarization.scenarios.collections;
 import java.util.*;
 
 import ru.cheremin.scalarization.ScenarioRun;
-import ru.cheremin.scalarization.infra.JvmArg;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static java.util.Arrays.asList;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
- * Only array of size 1 is scalarized with 1.8. Array of size >=2 is not scalarized
+ * Check if array of fixed size (size known to JIT) is scalarized with different
+ * read/write operations. I've tried 2 kind of read/write access:
+ * 1. "vectorized" -- loop-based, with variable indexes
+ * 2. "unrolled" -- with constant indexes
  * <p/>
- * TODO RC: random index array access
+ * There is much difference between this 2 options. With vectorized access (variable
+ * indexes) array instantiation is scalarized only for size=[0,1] (for both, 1.7.0_80
+ * and 1.8.0_77). Arrays of size > 1 are never seen scalarized with vectorized access.
  * <p/>
- * TODO RC: check array of size 0 (with .getClass())
+ * In contrast, with constant-index access ("unrolled loop") array is scalarized up
+ * to size=64 (inclusive).
  * <p/>
- * TODO RC: with full 64b pointers (i.e. without compressed oops) it must be up
- * to TrackedInitializationLimit=50?
+ * It is important to note: for long arrays it is hard to write constant-index access
+ * code which will touch _all_ arrays cells, because such code will be big, and it will
+ * breach inlining limits, but without inlining scalarization is dead. So I cheat: I
+ * access all cells only for short arrays (<10), and for longer arrays I access only
+ * 9 first cells + the last one, leaving cells in between untouched.
+ * <p/>
+ * <p/>
+ * TODO RC: with full 64b pointers (i.e. without compressed oops) scalarization must
+ * be up to TrackedInitializationLimit=50 only, but I see it up to 64...
  * <p/>
  * TODO RC: try fill with .arraycopy (seems like .arraycopy specifically annotated for
  * EA?)
@@ -37,56 +48,44 @@ public class FixedSizeObjectArrayScenario extends AllocationScenario {
 	public long run() {
 		final Integer[] array = new Integer[SIZE];
 
-		fill( array, ONE );
+		writeToArray( array, ONE );
 
-		final long sum = sum( array );
+		final long sum = readArray( array );
 
 		return sum;
 	}
 
 
-	private static long sum( final Integer[] array ) {
+	private static long readArray( final Integer[] array ) {
 		long sum = 0;
 		if( VECTORIZED ) {
-			for( final Integer b : array ) {
-				sum += b.longValue();
+			for( final Integer n : array ) {
+				sum += n.intValue();
 			}
 		} else {
-			//manual loop unrolling
+			//manual loop unrolling. Do not go too far, because inlining limits on
+			// method size will catch you! So only limited number of cells are accessed
 			switch( array.length ) {
 				default:
-				case 16:
-					sum += array[15].longValue();
-				case 15:
-					sum += array[14].longValue();
-				case 14:
-					sum += array[13].longValue();
-				case 13:
-					sum += array[12].longValue();
-				case 12:
-					sum += array[11].longValue();
-				case 11:
-					sum += array[10].longValue();
-				case 10:
-					sum += array[9].longValue();
+					sum += array[array.length - 1];
 				case 9:
-					sum += array[8].longValue();
+					sum += array[8].intValue();
 				case 8:
-					sum += array[7].longValue();
+					sum += array[7].intValue();
 				case 7:
-					sum += array[6].longValue();
+					sum += array[6].intValue();
 				case 6:
-					sum += array[5].longValue();
+					sum += array[5].intValue();
 				case 5:
-					sum += array[4].longValue();
+					sum += array[4].intValue();
 				case 4:
-					sum += array[3].longValue();
+					sum += array[3].intValue();
 				case 3:
-					sum += array[2].longValue();
+					sum += array[2].intValue();
 				case 2:
-					sum += array[1].longValue();
+					sum += array[1].intValue();
 				case 1:
-					sum += array[0].longValue();
+					sum += array[0].intValue();
 				case 0:
 					break;
 			}
@@ -94,30 +93,18 @@ public class FixedSizeObjectArrayScenario extends AllocationScenario {
 		return sum;
 	}
 
-	private static void fill( final Integer[] array,
-	                          final Integer value ) {
+	private static void writeToArray( final Integer[] array,
+	                                  final Integer value ) {
 		if( VECTORIZED ) {
 			for( int i = 0; i < array.length; i++ ) {
 				array[i] = value;
 			}
 		} else {
-			//manual loop unrolling
+			//manual loop unrolling. Do not go too far, because inlining limits on
+			// method size will catch you! So only limited number of cells are accessed
 			switch( array.length ) {
 				default:
-				case 16:
-					array[15] = value;
-				case 15:
-					array[14] = value;
-				case 14:
-					array[13] = value;
-				case 13:
-					array[12] = value;
-				case 12:
-					array[11] = value;
-				case 11:
-					array[10] = value;
-				case 10:
-					array[9] = value;
+					array[array.length - 1] = value;
 				case 9:
 					array[8] = value;
 				case 8:
@@ -150,12 +137,13 @@ public class FixedSizeObjectArrayScenario extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SIZE_KEY, 0, 1, 2, 50, 51, 64, 65 ),
 				allOf( VECTORIZED_ACCESS_KEY, true, false ),
-				asList(
-						new JvmArg.JvmExtendedFlag( "UseCompressedOops", true ),
-						new JvmArg.JvmExtendedFlag( "UseCompressedOops", false )
-				)
+				allOf( SIZE_KEY, 0, 1, 2, 4, 8, /*50, 51, */64, 65 )
+
+//				Arrays.asList( /* does scalarization depend on size of array slot? */
+//						new JvmArg.JvmExtendedFlag( "UseCompressedOops", true ),
+//						new JvmArg.JvmExtendedFlag( "UseCompressedOops", false )
+//				)
 		);
 	}
 
