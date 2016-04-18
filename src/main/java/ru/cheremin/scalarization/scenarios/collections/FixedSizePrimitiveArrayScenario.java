@@ -10,18 +10,19 @@ import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
 
 /**
- * Both 1.8.0_73 and 1.7.0_25 JVMs:
+ * Both 1.8.0_77 and 1.7.0_80 JVMs:
  * <p/>
- * With explicit cell access, like array[4], array is scalarized if length <= 64
- * With vectorized (looping) access array is NOT scalarized with length >1 (and IS
- * scalarized for length = 1).
- * Manual loop unrolling with switch still allow to scalarize array
+ * With explicit cell access, like array[4] (i.e. constant index), array is scalarized
+ * if length <= 64. With vectorized (looping, variable index) access array is NOT
+ * scalarized with length >1 (and IS scalarized for length <= 1).
+ *
+ * See also {@linkplain FixedSizeObjectArrayScenario} for discussion of method inline
+ * size limits
  * <p/>
  * <p/>
- * TODO RC: random index array access
- * TODO RC: random array length
  * <p/>
  * TODO long/double array (possible different upper limit)
+ *
  *
  * @author ruslan
  *         created 13.11.12 at 23:11
@@ -89,26 +90,11 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 
 	public static long sumUnrolled( final long[] array ) {
 		long sum = 0;
-		//manual loop unrolling
+		//manual loop unrolling. Do not go too far, because inlining limits on
+		// method size will catch you! So only limited number of cells are accessed
 		switch( array.length ) {
-			case 64:
-				sum += array[63];
 			default:
-				//RC: I'm too lazy to fill all
-			case 16:
-				sum += array[15];
-			case 15:
-				sum += array[14];
-			case 14:
-				sum += array[13];
-			case 13:
-				sum += array[12];
-			case 12:
-				sum += array[11];
-			case 11:
-				sum += array[10];
-			case 10:
-				sum += array[9];
+				sum += array[array.length - 1];
 			case 9:
 				sum += array[8];
 			case 8:
@@ -143,26 +129,11 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 
 	public static int sumUnrolled( final int[] array ) {
 		int sum = 0;
-		//manual loop unrolling
+		//manual loop unrolling. Do not go too far, because inlining limits on
+		// method size will catch you! So only limited number of cells are accessed
 		switch( array.length ) {
-			case 64:
-				sum += array[63];
 			default:
-				//RC: I'm too lazy to fill all
-			case 16:
-				sum += array[15];
-			case 15:
-				sum += array[14];
-			case 14:
-				sum += array[13];
-			case 13:
-				sum += array[12];
-			case 12:
-				sum += array[11];
-			case 11:
-				sum += array[10];
-			case 10:
-				sum += array[9];
+				sum += array[array.length - 1];
 			case 9:
 				sum += array[8];
 			case 8:
@@ -215,26 +186,11 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 
 	public static void fillUnrolled( final long[] array,
 	                                 final long value ) {
-		//manual loop unrolling
+		//manual loop unrolling. Do not go too far, because inlining limits on
+		// method size will catch you! So only limited number of cells are accessed
 		switch( array.length ) {
-			case 64:
-				array[63] = value;
 			default:
-				//RC: I'm too lazy to fill all
-			case 16:
-				array[15] = value;
-			case 15:
-				array[14] = value;
-			case 14:
-				array[13] = value;
-			case 13:
-				array[12] = value;
-			case 12:
-				array[11] = value;
-			case 11:
-				array[10] = value;
-			case 10:
-				array[9] = value;
+				array[array.length - 1] = value;
 			case 9:
 				array[8] = value;
 			case 8:
@@ -267,26 +223,11 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 
 	public static void fillUnrolled( final int[] array,
 	                                 final int value ) {
-		//manual loop unrolling
+		//manual loop unrolling. Do not go too far, because inlining limits on
+		// method size will catch you! So only limited number of cells are accessed
 		switch( array.length ) {
-			case 64:
-				array[63] = value;
 			default:
-				//RC: I'm too lazy to fill all
-			case 16:
-				array[15] = value;
-			case 15:
-				array[14] = value;
-			case 14:
-				array[13] = value;
-			case 13:
-				array[12] = value;
-			case 12:
-				array[11] = value;
-			case 11:
-				array[10] = value;
-			case 10:
-				array[9] = value;
+				array[array.length - 1] = value;
 			case 9:
 				array[8] = value;
 			case 8:
@@ -324,9 +265,9 @@ public class FixedSizePrimitiveArrayScenario extends AllocationScenario {
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SIZE_KEY, 0, 1, 2, /*4, 8, 16, */50, 51, 64, 65 ),
-				allOf( VECTORIZED_ACCESS_KEY, true, false ),
-				allOf( ARRAY_TYPE_KEY, ArrayType.values() )
+				allOf( VECTORIZED_ACCESS_KEY, false, true ),
+				allOf( ARRAY_TYPE_KEY, ArrayType.values() ),
+				allOf( SIZE_KEY, 0, 1, 2, /*4, 8, 16, */50, 51, 64, 65 )
 		);
 	}
 }
