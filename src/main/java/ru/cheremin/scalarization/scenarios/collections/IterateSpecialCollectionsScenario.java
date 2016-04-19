@@ -22,7 +22,9 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * will it be scalarized?
  *
  *
- * Seems like yes, all such patterns are stable scalarized in both 1.7 and 1.8.
+ * Seems like yes, all such patterns are stable scalarized in both 1.7 and 1.8, except
+ * with singletonMap().values(), which is not scalarized. As for singletonMap, the fail
+ * to scalarize is most likely due to caching of .values
  *
  * @author ruslan
  *         created 13.11.12 at 23:11

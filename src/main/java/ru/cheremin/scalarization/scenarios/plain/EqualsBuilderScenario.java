@@ -44,7 +44,7 @@ public class EqualsBuilderScenario extends AllocationScenario {
 
 	@Override
 	public long run() {
-		return BUILDER_TYPE.runWithKeys( keys );
+		return BUILDER_TYPE.equalsWithKeys( keys );
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class EqualsBuilderScenario extends AllocationScenario {
 	public enum BuilderType {
 		NORMAL {
 			@Override
-			public int runWithKeys( final String[] keys ) {
+			public int equalsWithKeys( final String[] keys ) {
 				final EqualsBuilder builder = new EqualsBuilder();
 				for( final String key : keys ) {
 					builder.append( key, key );
@@ -82,7 +82,7 @@ public class EqualsBuilderScenario extends AllocationScenario {
 		},
 		EXTENDED {
 			@Override
-			public int runWithKeys( final String[] keys ) {
+			public int equalsWithKeys( final String[] keys ) {
 				final EqualsBuilderEx builder = new EqualsBuilderEx();
 				for( final String key : keys ) {
 					builder.append( key, key );
@@ -95,7 +95,7 @@ public class EqualsBuilderScenario extends AllocationScenario {
 			}
 		};
 
-		public abstract int runWithKeys( final String[] keys );
+		public abstract int equalsWithKeys( final String[] keys );
 	}
 
 	@ScenarioRunArgs

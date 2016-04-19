@@ -261,11 +261,11 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
 
+				allOf( MAP_TYPE_KEY, MapType.values() ),
+
 				allOf( SIZE_KEY, 0, 1, 16, 65 ),
 
 				allOf( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, 0.0, 0.5, 1.0 ),
-
-				allOf( MAP_TYPE_KEY, MapType.values() ),
 
 				asList(
 						new JvmExtendedProperty( "InlineSmallCode", "1000" ),

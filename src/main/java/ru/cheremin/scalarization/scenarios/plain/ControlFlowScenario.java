@@ -18,15 +18,15 @@ import static ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario.Vect
  * <p/>
  * ALLOCATE_ONCE           : scalarized
  * <p/>
- * ALLOCATE_IN_LOOP        : scalarized
+ * ACCUMULATE_IN_LOOP        : scalarized
  * <p/>
  * REPLACE_IN_LOOP         : partially scalarized. For SIZE=1 fully scalarized, for
  * SIZE > 1 one of in-loop allocations is scalarized, other
  * SIZE allocations in loop + 1 out of loop are not scalarized
  * <p/>
- * ALLOCATE_CONDITIONALLY       : not scalarized
- * ALLOCATE_UN_CONDITIONALLY    : scalarized
- * ALLOCATE_UN_CONDITIONALLY2   : scalarized
+ * ASSIGN_REFERENCE_CONDITIONALLY       : not scalarized
+ * ASSIGN_REFERENCE_UN_CONDITIONALLY    : scalarized
+ * ASSIGN_REFERENCE_UN_CONDITIONALLY2   : scalarized
  *
  * @author ruslan
  *         created 09/02/16 at 20:11
@@ -44,16 +44,16 @@ public class ControlFlowScenario extends AllocationScenario {
 		switch( USE_TYPE ) {
 			case ALLOCATE_ONCE:
 				return allocateOnce( rnd );
-			case ALLOCATE_IN_LOOP:
-				return allocateInLoop( rnd );
+			case ACCUMULATE_IN_LOOP:
+				return accumulateInLoop( rnd );
 			case REPLACE_REFERENCE_IN_LOOP:
 				return replaceReferenceInLoop( rnd );
-			case ALLOCATE_CONDITIONALLY:
-				return allocateConditionally( rnd );
-			case ALLOCATE_UN_CONDITIONALLY:
-				return allocateUnConditionally( rnd );
-			case ALLOCATE_UN_CONDITIONALLY2:
-				return allocateUnConditionally2( rnd );
+			case ASSIGN_REFERENCE_CONDITIONALLY:
+				return assignReferenceConditionally( rnd );
+			case ASSIGN_REFERENCE_UN_CONDITIONALLY:
+				return assignReferenceUnConditionally( rnd );
+			case ASSIGN_REFERENCE_UN_CONDITIONALLY2:
+				return assignReferenceUnConditionally2( rnd );
 		}
 
 		throw new IllegalStateException( "Unknown USE_TYPE=" + USE_TYPE );
@@ -66,7 +66,7 @@ public class ControlFlowScenario extends AllocationScenario {
 		return ( long ) v1.add( v2 ).dot( v3 );
 	}
 
-	private long allocateInLoop( final ThreadLocalRandom rnd ) {
+	private long accumulateInLoop( final ThreadLocalRandom rnd ) {
 		final Vector2D v = randomVector( rnd );
 		for( int i = 0; i < SIZE; i++ ) {
 			final Vector2D addition = randomVector( rnd );
@@ -86,7 +86,7 @@ public class ControlFlowScenario extends AllocationScenario {
 		return ( long ) v.length();
 	}
 
-	private long allocateConditionally( final ThreadLocalRandom rnd ) {
+	private long assignReferenceConditionally( final ThreadLocalRandom rnd ) {
 		//RC: similar to replacement in loop: EA lost track of v's target object
 		// and this prevents EA to prove v can be scalarized
 		final Vector2D v;
@@ -99,7 +99,7 @@ public class ControlFlowScenario extends AllocationScenario {
 		return ( long ) v.length();
 	}
 
-	private long allocateUnConditionally( final ThreadLocalRandom rnd ) {
+	private long assignReferenceUnConditionally( final ThreadLocalRandom rnd ) {
 		//RC: and this one IS scalarized
 		if( rnd.nextBoolean() ) {
 			final Vector2D v = new Vector2D( 1, rnd.nextDouble() );
@@ -110,7 +110,7 @@ public class ControlFlowScenario extends AllocationScenario {
 		}
 	}
 
-	private long allocateUnConditionally2( final ThreadLocalRandom rnd ) {
+	private long assignReferenceUnConditionally2( final ThreadLocalRandom rnd ) {
 		//RC: this one IS also scalarized
 		final double x, y;
 		if( rnd.nextBoolean() ) {
@@ -178,12 +178,12 @@ public class ControlFlowScenario extends AllocationScenario {
 	public enum Type {
 		ALLOCATE_ONCE,
 
-		ALLOCATE_IN_LOOP,
+		ACCUMULATE_IN_LOOP,
 		REPLACE_REFERENCE_IN_LOOP,
 
-		ALLOCATE_CONDITIONALLY,
-		ALLOCATE_UN_CONDITIONALLY,
-		ALLOCATE_UN_CONDITIONALLY2;
+		ASSIGN_REFERENCE_CONDITIONALLY,
+		ASSIGN_REFERENCE_UN_CONDITIONALLY,
+		ASSIGN_REFERENCE_UN_CONDITIONALLY2;
 	}
 
 	@ScenarioRunArgs
@@ -199,19 +199,19 @@ public class ControlFlowScenario extends AllocationScenario {
 		runs.add(
 				runWith(
 						"scenario.size", -1,
-						"scenario.use-type", Type.ALLOCATE_CONDITIONALLY
+						"scenario.use-type", Type.ASSIGN_REFERENCE_CONDITIONALLY
 				)
 		);
 		runs.add(
 				runWith(
 						"scenario.size", -1,
-						"scenario.use-type", Type.ALLOCATE_UN_CONDITIONALLY
+						"scenario.use-type", Type.ASSIGN_REFERENCE_UN_CONDITIONALLY
 				)
 		);
 		runs.add(
 				runWith(
 						"scenario.size", -1,
-						"scenario.use-type", Type.ALLOCATE_UN_CONDITIONALLY2
+						"scenario.use-type", Type.ASSIGN_REFERENCE_UN_CONDITIONALLY2
 				)
 		);
 
@@ -220,7 +220,7 @@ public class ControlFlowScenario extends AllocationScenario {
 			runs.add(
 					runWith(
 							"scenario.size", size,
-							"scenario.use-type", Type.ALLOCATE_IN_LOOP
+							"scenario.use-type", Type.ACCUMULATE_IN_LOOP
 					)
 			);
 		}

@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils;
+import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
@@ -33,7 +33,7 @@ public class PreconditionsScenario extends AllocationScenario {
 			System.getProperty( CHECK_FAILED_PROBABILITY_KEY, "1e-5" )
 	);
 
-	private final Utils.StringsPool args = randomStringsPool( 1024 );
+	private final StringsPool pool = randomStringsPool( 1024 );
 
 	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
@@ -43,7 +43,7 @@ public class PreconditionsScenario extends AllocationScenario {
 			switch( SIZE ) {
 				//no reason to check 0-args since there is checkArgument 0-args version
 				case 1: {
-					checkArgumentOneArg();
+					checkArgument1Arg();
 					return 0;
 				}
 				case 2: {
@@ -67,33 +67,33 @@ public class PreconditionsScenario extends AllocationScenario {
 		}
 	}
 
-	private void checkArgumentOneArg() {
-		final boolean expression = mostProbablyTrue();
-		final String arg1 = args.next();
+	private void checkArgument1Arg() {
+		final boolean expression = falseWithProbability( CHECK_FAILED_PROBABILITY );
+		final String arg1 = pool.next();
 		checkArgument( expression, "1-arg(%s) message", arg1 );
 	}
 
 	private void checkArgument2Args() {
-		final boolean expression = mostProbablyTrue();
-		final String arg1 = args.next();
-		final String arg2 = args.next();
+		final boolean expression = falseWithProbability( CHECK_FAILED_PROBABILITY );
+		final String arg1 = pool.next();
+		final String arg2 = pool.next();
 		checkArgument( expression, "2-arg(%s, %s) message", arg1, arg2 );
 	}
 
 	private void checkArgument3Args() {
-		final boolean expression = mostProbablyTrue();
-		final String arg1 = args.next();
-		final String arg2 = args.next();
-		final String arg3 = args.next();
+		final boolean expression = falseWithProbability( CHECK_FAILED_PROBABILITY );
+		final String arg1 = pool.next();
+		final String arg2 = pool.next();
+		final String arg3 = pool.next();
 		checkArgument( expression, "3-arg(%s, %s, %s) message", arg1, arg2, arg3 );
 	}
 
 	private void checkArgument4Args() {
-		final boolean expression = mostProbablyTrue();
-		final String arg1 = args.next();
-		final String arg2 = args.next();
-		final String arg3 = args.next();
-		final String arg4 = args.next();
+		final boolean expression = falseWithProbability( CHECK_FAILED_PROBABILITY );
+		final String arg1 = pool.next();
+		final String arg2 = pool.next();
+		final String arg3 = pool.next();
+		final String arg4 = pool.next();
 		checkArgument( expression, "4-arg(%s, %s, %s, %s) message", arg1, arg2, arg3, arg4 );
 	}
 
@@ -102,18 +102,18 @@ public class PreconditionsScenario extends AllocationScenario {
 		return "failed probability: " + CHECK_FAILED_PROBABILITY;
 	}
 
-	private boolean mostProbablyTrue() {
+	private boolean falseWithProbability( final double falseProbability ) {
 		//RC: 'false' must be possible (so JIT can't prove it impossible and DCE code
 		// altogether), but it should be very unlikely, since I don't want exception
 		// to be really thrown
-		return rnd.nextDouble() >= CHECK_FAILED_PROBABILITY;
+		return rnd.nextDouble() >= falseProbability;
 	}
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( SIZE_KEY, 1, 2, 3, 4 ),
-				allOf( CHECK_FAILED_PROBABILITY_KEY, "1e-7", "1e-9", "1e-11" )
+				allOf( CHECK_FAILED_PROBABILITY_KEY, "1e-7", "1e-9", "1e-11" ),
+				allOf( SIZE_KEY, 1, 2, 3, 4 )
 		);
 	}
 }
