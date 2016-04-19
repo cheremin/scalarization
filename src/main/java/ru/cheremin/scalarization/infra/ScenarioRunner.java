@@ -21,12 +21,13 @@ import static ru.cheremin.scalarization.infra.AllocationBenchmarkMain.SCENARIO_C
  *         created 31/03/16 at 00:50
  */
 public class ScenarioRunner {
-	private static final Predicate<JvmArg> AGENTLIB = new Predicate<JvmArg>() {
+	private static final Predicate<JvmArg> AGENT_LIB = new Predicate<JvmArg>() {
 		@Override
 		public boolean apply( final JvmArg arg ) {
 			return arg.name().contains( "agentlib" );
 		}
 	};
+
 	private final ScenarioRun[] extendedRunArguments;
 
 	private final Class<? extends AllocationScenario> scenarioClass;
@@ -65,7 +66,7 @@ public class ScenarioRunner {
 			final JvmProcessBuilder currentJvm = JvmProcessBuilder
 					.copyCurrentJvm()
 					.appendArgOverriding( new SystemProperty( SCENARIO_CLASS_KEY, scenarioClass.getCanonicalName() ) )
-					.removeArg( AGENTLIB /*can't debug 2 JVMs with same settings */ )
+					.removeArg( AGENT_LIB /*can't debug 2 JVMs with same settings */ )
 					.withMainClass( AllocationBenchmarkMain.class );
 
 
@@ -79,15 +80,15 @@ public class ScenarioRunner {
 					runProcess( executor, out, forkedJvmCmd );
 				}
 			} else {
-				for( final ScenarioRun scenarioRun : scenarioRuns ) {
-					final JvmProcessBuilder scenarioJvm = currentJvm.appendArgsOverriding( scenarioRun.getJvmArgs() );
-					for( final ScenarioRun extendedRunArgs : extendedRunArguments ) {
+				for( final ScenarioRun extendedRunArgs : extendedRunArguments ) {
+					final JvmProcessBuilder currentWithExtendedArgs = currentJvm.appendArgsOverriding( extendedRunArgs.getJvmArgs() );
+					for( final ScenarioRun scenarioRun : scenarioRuns ) {
+						final JvmProcessBuilder scenarioJvm = currentWithExtendedArgs.appendArgsOverriding( scenarioRun.getJvmArgs() );
 						out.println( "Repeating run with " + extendedRunArgs + " x " + scenarioRun );
 						out.flush();
 
-						final JvmProcessBuilder scenarioJvmWithExtendedArgs = scenarioJvm.appendArgsOverriding( extendedRunArgs.getJvmArgs() );
 
-						final List<String> forkedJvmCmd = scenarioJvmWithExtendedArgs.buildJvmCommandLine();
+						final List<String> forkedJvmCmd = scenarioJvm.buildJvmCommandLine();
 						runProcess( executor, out, forkedJvmCmd );
 					}
 				}
