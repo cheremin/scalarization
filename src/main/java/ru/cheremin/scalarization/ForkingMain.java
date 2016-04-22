@@ -33,8 +33,11 @@ public class ForkingMain {
 
 
 	private static final ScenarioRun[] EXTENDED_RUN_PARAMETERS = {
-			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", true ) ),
-			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", false ) )
+//			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", true ) ),
+//			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", false ) )
+
+			new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", true ) ),
+			new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", false ) )
 			//TODO: add -server/-client?
 	};
 

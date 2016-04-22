@@ -14,19 +14,26 @@ import static ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario.Vect
 /**
  * Check simple Vector2D arithmetic in different scenarios
  * <p/>
- * Results (both 1.7.0_25 and 1.8.0_73):
+ * Results (both 1.7.0_80 and 1.8.0_77):
  * <p/>
- * ALLOCATE_ONCE           : scalarized
+ * ALLOCATE_ONCE                : scalarized
  * <p/>
- * ACCUMULATE_IN_LOOP        : scalarized
+ * ACCUMULATE_IN_LOOP           : scalarized
  * <p/>
- * REPLACE_IN_LOOP         : partially scalarized. For SIZE=1 fully scalarized, for
- * SIZE > 1 one of in-loop allocations is scalarized, other
+ * REPLACE_IN_LOOP              : partially scalarized. For SIZE=1 fully scalarized,
+ * for SIZE > 1 one of in-loop allocations is scalarized, other
  * SIZE allocations in loop + 1 out of loop are not scalarized
  * <p/>
  * ASSIGN_REFERENCE_CONDITIONALLY       : not scalarized
  * ASSIGN_REFERENCE_UN_CONDITIONALLY    : scalarized
  * ASSIGN_REFERENCE_UN_CONDITIONALLY2   : scalarized
+ *
+ * The main idea is: if one reference variable may referent different object (i.e.
+ * allocation sites) -- in different execution scenarios, or even in same scenario --
+ * such allocations are not scalarized, because it is hard to trace which object
+ * variable refer to right now. Sometimes this is possible, and even obvious -- like
+ * in ASSIGN_REFERENCE_CONDITIONALLY example -- but in general it is not, and JIT devs
+ * decided not to deal with it: <a href="http://hg.openjdk.java.net/jdk9/dev/hotspot/file/68e9c20cfb88/src/share/vm/opto/escape.cpp#l1732">see comment #6</a>
  *
  * @author ruslan
  *         created 09/02/16 at 20:11

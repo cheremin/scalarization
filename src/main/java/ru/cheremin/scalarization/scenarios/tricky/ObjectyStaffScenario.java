@@ -58,8 +58,8 @@ public class ObjectyStaffScenario extends AllocationScenario {
 			case REFERENCE_EQUALITY: {
 				return referenceEquality();
 			}
-			case EQUALS_NOT_OVERRIDEN: {
-				return equalsNotOverriden();
+			case EQUALS_NOT_OVERRIDDEN: {
+				return equalsNotOverridden();
 			}
 			case GET_CLASS: {
 				return getClazz();
@@ -102,7 +102,7 @@ public class ObjectyStaffScenario extends AllocationScenario {
 		return System.identityHashCode( o );
 	}
 
-	private int equalsNotOverriden() {
+	private int equalsNotOverridden() {
 		final WithoutCustomHashCode o1 = new WithoutCustomHashCode(
 				nextLong(),
 				nextLong()
@@ -206,7 +206,7 @@ public class ObjectyStaffScenario extends AllocationScenario {
 		IDENTITY_HASH_CODE,
 
 		REFERENCE_EQUALITY,
-		EQUALS_NOT_OVERRIDEN,
+		EQUALS_NOT_OVERRIDDEN,
 
 		GET_CLASS;
 

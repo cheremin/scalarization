@@ -83,6 +83,10 @@ public class ReturnTupleScenario extends AllocationScenario {
 			}
 		},
 		MIXED_PAIR {
+			//RC: this is not scalarized, and my first guess was it is because of mixed
+			//  type -- i.e. runtime will need exact type for de-optimization, but here
+			//  it could be 2 types. While the hypothesis is reasonable, this specific
+			//  case is not about it...
 			@Override
 			public Pair<String, String> tuple( final StringsPool pool ) {
 				final String value1 = pool.next();
@@ -91,6 +95,21 @@ public class ReturnTupleScenario extends AllocationScenario {
 					return MutablePair.of( value1, value2 );
 				} else {
 					return ImmutablePair.of( value1, value2 );
+				}
+			}
+		},
+		SAME_PAIR_IN_BRANCHES {
+			//... because this is ALSO not scalarized, despite the fact here types are
+			//  the same. So now it looks like same issue as in ControlFlowScenario:
+			//  i.e. join in 1 reference values come from different branches.
+			@Override
+			public Pair<String, String> tuple( final StringsPool pool ) {
+				final String value1 = pool.next();
+				final String value2 = pool.next();
+				if( value1.length() < value2.length() ) {
+					return MutablePair.of( value1, value2 );
+				} else {
+					return MutablePair.of( value1, value2 );
 				}
 			}
 		},
