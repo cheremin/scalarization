@@ -9,13 +9,16 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
 
 /**
- * Looks like HashCodeBuilder stably scalarized by 1.7-1.8
+ * It looks like nested objects are _not_ scalarized (same as inner classes).
+ * I'm sad here
  *
  * @author ruslan
  *         created 16/02/16 at 23:45
  */
 public class NestedObjectsScenario extends AllocationScenario {
+
 	public static final String TYPE_KEY = "scenario.type";
+
 	public static final Type TYPE = Type.valueOf(
 			System.getProperty( TYPE_KEY, Type.NESTED_0.name() )
 	);
