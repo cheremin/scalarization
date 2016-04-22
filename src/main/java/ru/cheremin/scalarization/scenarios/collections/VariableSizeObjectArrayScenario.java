@@ -11,10 +11,17 @@ import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
 
 /**
+ * Seems to scalarize with size 1. This is strange, because escape.cpp explicitly
+ * states only statically-sized arrays have chance to be scalarized. I think, this
+ * is because for small SIZE JIT is able to predict rnd.nextInt(SIZE) (it may be not
+ * so hard because of [bits % 1] statement inside loop).
+ *
+ * TODO RC: I'm waiting for the way to generate 0-1 so JIT can't predict them
+ *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
-public class ObjectArrayUnpredictableSizeAllocator extends AllocationScenario {
+public class VariableSizeObjectArrayScenario extends AllocationScenario {
 
 	@Override
 	public long run() {
@@ -27,6 +34,7 @@ public class ObjectArrayUnpredictableSizeAllocator extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		return runWithAll( SIZE_KEY, 0, 1, 2, 16 /*, 64, 65*/ );
+		//RC: 0 is not acceptable for rnd.nextInt()
+		return runWithAll( SIZE_KEY, 1, 2, 16 /*, 64, 65*/ );
 	}
 }
