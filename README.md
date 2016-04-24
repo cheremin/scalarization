@@ -20,7 +20,7 @@ all parameters space. Results will be stored in `results` folder, file per scena
 But this will take quite long: *~10 hours* right now on my laptop.
 
 More targeted run will look like this:
-```
+```bash
 $JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server -XX:+UseSerialGC ...\
 		-Dscenario=ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario \
 		-Dtarget-directory=results \
@@ -32,7 +32,7 @@ for all parameters space, which is not too big for this scenario, so it takes on
 as main class, with all parameters above
 
 And most targeted run will look like this:
-```
+```bash
 $JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server -XX:+UseSerialGC ...\
 		-Dscenario=ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario \
 		-Dscenario.use-type=ACCUMULATE_IN_LOOP \
@@ -45,3 +45,52 @@ Here I run specific scenario with specific parameters.
 Scenario parameters (`-Dscenario.use-type=ACCUMULATE_IN_LOOP -Dscenario.size=0`) are
 different for each scenario (`scenario.size` is more or less universal, since used by
 many, but not all, scenarios)
+
+## How to create scenario ##
+Scenario is a class, which extends `ru.cheremin.scalarization.scenarios.AllocationScenario`.
+You can pause at this point in the beginning, and try. Without parameters, there is
+little difference between running scenario with `ForkingMain` or `AllocationBenchmarkMain`
+runners, so better to run with `AllocationBenchmarkMain`, since it allows you to debug
+(`ForkingMain` forks dedicated jvm process for each scenario run, so debugging is not
+easy)
+
+Next option is to specify parameters space for scenario. In you scenario class you should
+specify
+```java
+@ScenarioRunArgs
+public static List<ScenarioRun> parametersToRunWith() {
+	...
+}
+```
+(method name is not important -- ``@ScenarioRunArgs` annotation is). `ScenarioRun` class
+contains list of additional JVM options to append/override before run the scenario. JVM
+options could be something like `-Dname=value` (`JvmArg.SystemProperty`), or any other
+JVM flag/option -- e.g. `-XX:InlineSmallCode=2000` (`JvmArg.JvmExtendedProperty`). There
+are bunch of helpers for making list of parameters:
+```java
+@ScenarioRunArgs
+public static List<ScenarioRun> parametersToRunWith() {
+	return crossJoin(
+			allOf( BUILDER_TYPE_KEY, BuilderType.values() ),
+			allOf( SIZE_KEY, 0, 1, 4, 128 ),
+
+			asList(
+					new JvmExtendedProperty( "FreqInlineSize", "325" ),
+					new JvmExtendedProperty( "FreqInlineSize", "500" )
+			)
+	);
+}
+```
+(from `EqualsBuilderScenario`). Here I build scenario space as "cube" with builderType
+side going though all `BuilderType.values()`, size side going through [0, 1, 4, 128],
+and `-XX:FreqInlineSize` going through [325, 500]: `2 * 4 * 2 = 16` runs.
+
+So, most parameters are passed in scenario code with system properties, as this way
+you could read them into `public static final` fields, which, in turn, allows JIT to
+aggressively inline them. You could look at `EqualsBuilderScenario` for an example.
+
+If you run you scenario with `ForkingMain`, it will append additional "dimension" to
+your parameters space: `-XX:+EliminateAllocations / -XX:-EliminateAllocations`. This
+is default "control" to verify is scalar replacement really in charge of cleaned
+allocations
+
