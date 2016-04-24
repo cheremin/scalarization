@@ -15,24 +15,25 @@ public class Utils {
 		return keys;
 	}
 
-	public static StringsPool randomStringsPool( final int universeSize ) {
+	public static Pool<String> randomStringsPool( final int universeSize ) {
 		final String[] strings = generateStringArray( universeSize );
-		return new StringsPool( strings );
+		return new Pool<>( strings );
 	}
 
-	public static class StringsPool {
-		private final String[] strings;
+	public static class Pool<T> {
+		private final T[] items;
 
-		public StringsPool( final String[] strings ) {
-			checkArgument( strings != null, "strings can't be null" );
-			this.strings = strings;
+		public Pool( final T[] items ) {
+			checkArgument( items != null, "items can't be null" );
+			checkArgument( items.length > 0, "items can't be empty" );
+			this.items = items;
 		}
 
 		private int index = 0;
 
-		public String next() {
-			index = ( index + 1 ) % strings.length;
-			return strings[index];
+		public T next() {
+			index = ( index + 1 ) % items.length;
+			return items[index];
 		}
 	}
 

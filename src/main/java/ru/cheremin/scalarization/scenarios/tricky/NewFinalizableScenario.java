@@ -1,7 +1,7 @@
 package ru.cheremin.scalarization.scenarios.tricky;
 
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
@@ -13,7 +13,7 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
  *         created 10/02/16 at 15:11
  */
 public class NewFinalizableScenario extends AllocationScenario {
-	private final Utils.StringsPool generator = randomStringsPool( SIZE );
+	private final Pool<String> generator = randomStringsPool( SIZE );
 
 	@Override
 	public long run() {

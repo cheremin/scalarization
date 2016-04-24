@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
@@ -19,7 +19,7 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
  *         created 10/02/16 at 15:11
  */
 public class NewRunnableScenario extends AllocationScenario {
-	private final StringsPool generator = randomStringsPool( 1024 );
+	private final Pool<String> generator = randomStringsPool( 1024 );
 
 	@Override
 	public long run() {

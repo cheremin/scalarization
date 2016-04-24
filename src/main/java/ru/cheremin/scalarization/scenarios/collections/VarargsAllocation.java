@@ -2,7 +2,7 @@ package ru.cheremin.scalarization.scenarios.collections;
 
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 import ru.cheremin.scalarization.scenarios.Utils;
-import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 /**
  * But for Object[]/int[] size <= 64! (see <a href="http://www.javaspecialists.eu/archive/Issue179.html">link</a>)
@@ -10,12 +10,12 @@ import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
  * <p/>
  * If access is going via looping -- array scalarized only for 1 element
  *
- * @see FixedSizeObjectArrayScenario
  * @author ruslan
  *         created 09/02/16 at 13:19
+ * @see FixedSizeObjectArrayScenario
  */
 public class VarargsAllocation extends AllocationScenario {
-	private final StringsPool keys = Utils.randomStringsPool( 1024 );
+	private final Pool<String> keys = Utils.randomStringsPool( 1024 );
 
 	@Override
 	public long run() {

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
 import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
@@ -35,7 +35,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 			System.getProperty( TUPLE_TYPE_KEY, TupleType.IMMUTABLE_PAIR.name() )
 	);
 
-	private final StringsPool pool = randomStringsPool( 1024 );
+	private final Pool<String> pool = randomStringsPool( 1024 );
 
 	@Override
 	public long run() {
@@ -56,7 +56,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 	public enum TupleType {
 		IMMUTABLE_PAIR {
 			@Override
-			public Pair<String, String> tuple( final StringsPool pool ) {
+			public Pair<String, String> tuple( final Pool<String> pool ) {
 				final String value1 = pool.next();
 				final String value2 = pool.next();
 				return ImmutablePair.of( value1, value2 );
@@ -64,7 +64,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 		},
 		MUTABLE_PAIR {
 			@Override
-			public Pair<String, String> tuple( final StringsPool pool ) {
+			public Pair<String, String> tuple( final Pool<String> pool ) {
 				final String value1 = pool.next();
 				final String value2 = pool.next();
 				return MutablePair.of( value1, value2 );
@@ -72,7 +72,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 		},
 		PAIR_OR_NULL {
 			@Override
-			public Pair<String, String> tuple( final StringsPool pool ) {
+			public Pair<String, String> tuple( final Pool<String> pool ) {
 				final String value1 = pool.next();
 				final String value2 = pool.next();
 				if( value1.length() < value2.length() ) {
@@ -88,7 +88,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 			//  it could be 2 types. While the hypothesis is reasonable, this specific
 			//  case is not about it...
 			@Override
-			public Pair<String, String> tuple( final StringsPool pool ) {
+			public Pair<String, String> tuple( final Pool<String> pool ) {
 				final String value1 = pool.next();
 				final String value2 = pool.next();
 				if( value1.length() < value2.length() ) {
@@ -103,7 +103,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 			//  the same. So now it looks like same issue as in ControlFlowScenario:
 			//  i.e. join in 1 reference values come from different branches.
 			@Override
-			public Pair<String, String> tuple( final StringsPool pool ) {
+			public Pair<String, String> tuple( final Pool<String> pool ) {
 				final String value1 = pool.next();
 				final String value2 = pool.next();
 				if( value1.length() < value2.length() ) {
@@ -115,7 +115,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 		},
 		MIXED_PAIR_OR_NULL {
 			@Override
-			public Pair<String, String> tuple( final StringsPool pool ) {
+			public Pair<String, String> tuple( final Pool<String> pool ) {
 				final String value1 = pool.next();
 				final String value2 = pool.next();
 				final char c1 = value1.charAt( 0 );
@@ -130,7 +130,7 @@ public class ReturnTupleScenario extends AllocationScenario {
 			}
 		};
 
-		public abstract Pair<String, String> tuple( final StringsPool pool );
+		public abstract Pair<String, String> tuple( final Pool<String> pool );
 	}
 
 

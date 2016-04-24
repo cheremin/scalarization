@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils.StringsPool;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
@@ -19,7 +19,7 @@ import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
  * exceptions thrown and catch) lead to re-compilation(?) and after it allocations are
  * not scalarized anymore (even if there is no more fails happens for quite a long time).
  * I'm not sure about recompilation, though.
- *
+ * <p/>
  * Java 1.8: Seems like scalarization is not so stable even then check is not failing
  * at all. Still do not understand backgrounds
  *
@@ -33,7 +33,7 @@ public class PreconditionsScenario extends AllocationScenario {
 			System.getProperty( CHECK_FAILED_PROBABILITY_KEY, "1e-5" )
 	);
 
-	private final StringsPool pool = randomStringsPool( 1024 );
+	private final Pool<String> pool = randomStringsPool( 1024 );
 
 	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 

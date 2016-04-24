@@ -5,9 +5,10 @@ import java.util.*;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
+import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
 /**
  * .hashCode() is very like something "identity-like" (object-y), so I've tried to
@@ -18,15 +19,15 @@ import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
  * <p/>
  * See {@linkplain ObjectyStaffScenario} for more objecty-tests like this
  * one. Maybe even remove this test, since it is duplicated there
- *
- *
+ * <p/>
+ * <p/>
  * TODO: How it depends on StringKey size? Make String64Key?
  *
  * @author ruslan
  *         created 09/02/16 at 23:51
  */
 public class GetHashCodeScenario extends AllocationScenario {
-	private final Utils.StringsPool keysGenerator = Utils.randomStringsPool( 1024 );
+	private final Pool<String> keysGenerator = randomStringsPool( 1024 );
 
 
 	@Override

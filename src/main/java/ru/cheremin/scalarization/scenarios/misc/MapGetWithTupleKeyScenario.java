@@ -9,11 +9,12 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedProperty;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
-import ru.cheremin.scalarization.scenarios.Utils;
+import ru.cheremin.scalarization.scenarios.Utils.Pool;
 
 import static java.util.Arrays.asList;
 import static ru.cheremin.scalarization.ScenarioRun.allOf;
 import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
+import static ru.cheremin.scalarization.scenarios.Utils.randomStringsPool;
 
 /**
  * With SimplestMap keys are successfully scalarized on 1.8.0_73, but not on 1.7. With
@@ -57,7 +58,7 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 			System.getProperty( MAP_TYPE_KEY, MapType.HASH_MAP.name() )
 	);
 
-	private final Utils.StringsPool keys = Utils.randomStringsPool( 1024 );
+	private final Pool<String> keys = randomStringsPool( 1024 );
 
 	private final Map<StringKey, String> map;
 	private final SimplestMap<StringKey, String> simplestMap;
