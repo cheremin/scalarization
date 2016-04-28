@@ -21,7 +21,7 @@ But this will take quite long: *~10 hours* right now on my laptop.
 
 More targeted run will look like this:
 ```bash
-$JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server -XX:+UseSerialGC ...\
+$JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server  ...\
 		-Dscenario=ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario \
 		-Dtarget-directory=results \
 		 -jar target/benchmarks.jar
@@ -33,7 +33,7 @@ as main class, with all parameters above
 
 And most targeted run will look like this:
 ```bash
-$JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server -XX:+UseSerialGC ...\
+$JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server ...\
 		-Dscenario=ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario \
 		-Dscenario.use-type=ACCUMULATE_IN_LOOP \
 		-Dscenario.size=0 \
@@ -83,14 +83,16 @@ public static List<ScenarioRun> parametersToRunWith() {
 ```
 (from `EqualsBuilderScenario`). Here I build scenario space as "cube" with builderType
 side going though all `BuilderType.values()`, size side going through [0, 1, 4, 128],
-and `-XX:FreqInlineSize` going through [325, 500]: `2 * 4 * 2 = 16` runs.
-
-So, most parameters are passed in scenario code with system properties, as this way
-you could read them into `public static final` fields, which, in turn, allows JIT to
-aggressively inline them. You could look at `EqualsBuilderScenario` for an example.
-
-If you run you scenario with `ForkingMain`, it will append additional "dimension" to
+and `-XX:FreqInlineSize` going through [325, 500]: `2 * 4 * 2 = 16` runs in total.
+If you run your scenario with `ForkingMain`, it will append additional "dimension" to
 your parameters space: `-XX:+EliminateAllocations / -XX:-EliminateAllocations`. This
 is default "control" to verify is scalar replacement really in charge of cleaned
-allocations
+allocations, so in this case it will be 32 runs in total
+
+As you can see, most parameters are passed in scenario code with system properties,
+as this way you could read them into `public static final` fields, which, in turn,
+allows JIT to aggressively inline them. Again, look at `EqualsBuilderScenario` for
+an example.
+
+
 
