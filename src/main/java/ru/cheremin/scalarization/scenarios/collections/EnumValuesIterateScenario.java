@@ -15,7 +15,7 @@ import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
-public class EnumValuesIterateAllocator extends AllocationScenario {
+public class EnumValuesIterateScenario extends AllocationScenario {
 	//TODO RC: generate enum class of appropriate size on the fly, with byte-code-gen
 
 	@Override

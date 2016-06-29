@@ -27,9 +27,10 @@ import static ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario.Vect
  * ASSIGN_REFERENCE_CONDITIONALLY       : not scalarized
  * ASSIGN_REFERENCE_UN_CONDITIONALLY    : scalarized
  * ASSIGN_REFERENCE_UN_CONDITIONALLY2   : scalarized
- *
+ * ASSIGN_REFERENCE_CONDITIONALLY2      : TODO ???
+ * <p/>
  * The main idea is: if one reference variable may referent different object (i.e.
- * allocation sites) -- in different execution scenarios, or even in same scenario --
+ * "allocation sites") -- in different execution scenarios, or even in same scenario --
  * such allocations are not scalarized, because it is hard to trace which object
  * variable refer to right now. Sometimes this is possible, and even obvious -- like
  * in ASSIGN_REFERENCE_CONDITIONALLY example -- but in general it is not, and JIT devs
@@ -57,6 +58,8 @@ public class ControlFlowScenario extends AllocationScenario {
 				return replaceReferenceInLoop( rnd );
 			case ASSIGN_REFERENCE_CONDITIONALLY:
 				return assignReferenceConditionally( rnd );
+			case ASSIGN_REFERENCE_CONDITIONALLY2:
+				return assignReferenceConditionally2( rnd );
 			case ASSIGN_REFERENCE_UN_CONDITIONALLY:
 				return assignReferenceUnConditionally( rnd );
 			case ASSIGN_REFERENCE_UN_CONDITIONALLY2:
@@ -132,6 +135,22 @@ public class ControlFlowScenario extends AllocationScenario {
 		return ( long ) v.length();
 	}
 
+	private long assignReferenceConditionally2( final ThreadLocalRandom rnd ) {
+		//RC: this one IS scalarized, even though there are _more_ allocation sites
+		//  comparing with .assignReferenceConditionally(). This is because here each
+		//  reference clearly refer only one object
+		final Vector2D result = new Vector2D();
+		if( rnd.nextBoolean() ) {
+			final Vector2D v1 = new Vector2D( 1, rnd.nextDouble() );
+			result.copyFrom( v1 );
+		} else {
+			final Vector2D v1 = new Vector2D( rnd.nextDouble(), 1 );
+			result.copyFrom( v1 );
+		}
+
+		return ( long ) result.length();
+	}
+
 	@Override
 	public String additionalInfo() {
 		return USE_TYPE.name();
@@ -146,6 +165,10 @@ public class ControlFlowScenario extends AllocationScenario {
 					rnd.nextDouble(),
 					rnd.nextDouble()
 			);
+		}
+
+		public Vector2D() {
+			x = y = 0;
 		}
 
 		public Vector2D( final double x,
@@ -180,6 +203,11 @@ public class ControlFlowScenario extends AllocationScenario {
 		public double length() {
 			return Math.sqrt( this.dot( this ) );
 		}
+
+		public void copyFrom( final Vector2D other ) {
+			this.x = other.x;
+			this.y = other.y;
+		}
 	}
 
 	public enum Type {
@@ -190,7 +218,8 @@ public class ControlFlowScenario extends AllocationScenario {
 
 		ASSIGN_REFERENCE_CONDITIONALLY,
 		ASSIGN_REFERENCE_UN_CONDITIONALLY,
-		ASSIGN_REFERENCE_UN_CONDITIONALLY2;
+		ASSIGN_REFERENCE_UN_CONDITIONALLY2,
+		ASSIGN_REFERENCE_CONDITIONALLY2;
 	}
 
 	@ScenarioRunArgs
