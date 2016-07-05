@@ -27,7 +27,7 @@ import static ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario.Vect
  * ASSIGN_REFERENCE_CONDITIONALLY       : not scalarized
  * ASSIGN_REFERENCE_UN_CONDITIONALLY    : scalarized
  * ASSIGN_REFERENCE_UN_CONDITIONALLY2   : scalarized
- * ASSIGN_REFERENCE_CONDITIONALLY2      : TODO ???
+ * ASSIGN_REFERENCE_CONDITIONALLY2      : scalarized
  * <p/>
  * The main idea is: if one reference variable may referent different object (i.e.
  * "allocation sites") -- in different execution scenarios, or even in same scenario --
