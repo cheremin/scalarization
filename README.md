@@ -43,7 +43,7 @@ $JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server ...\
 Here I run specific scenario with specific parameters.
 
 Scenario parameters (`-Dscenario.use-type=ACCUMULATE_IN_LOOP -Dscenario.size=0`) are
-different for each scenario (`scenario.size` is more or less universal, since used by
+different for each scenario (`scenario.size` is more or less universal, it is used by
 many, but not all, scenarios)
 
 ## How to create scenario ##
@@ -51,8 +51,7 @@ Scenario is a class, which extends `ru.cheremin.scalarization.scenarios.Allocati
 You can pause at this point in the beginning, and try. Without parameters, there is
 little difference between running scenario with `ForkingMain` or `AllocationBenchmarkMain`
 runners, so better to run with `AllocationBenchmarkMain`, since it allows you to debug
-(`ForkingMain` forks dedicated jvm process for each scenario run, so debugging is not
-easy)
+(`ForkingMain` forks dedicated jvm process for each scenario run, making debugging harder)
 
 Next option is to specify parameters space for scenario. In you scenario class you should
 specify
@@ -62,11 +61,11 @@ public static List<ScenarioRun> parametersToRunWith() {
 	...
 }
 ```
-(method name is not important -- ``@ScenarioRunArgs` annotation is). `ScenarioRun` class
-contains list of additional JVM options to append/override before run the scenario. JVM
-options could be something like `-Dname=value` (`JvmArg.SystemProperty`), or any other
-JVM flag/option -- e.g. `-XX:InlineSmallCode=2000` (`JvmArg.JvmExtendedProperty`). There
-are bunch of helpers for making list of parameters:
+(method name is not important, `@ScenarioRunArgs` annotation is a key). `ScenarioRun`
+class contains list of additional JVM options to append/override before run the scenario.
+JVM options could be something like `-Dname=value` (`JvmArg.SystemProperty`), or any
+other JVM flag/option -- e.g. `-XX:InlineSmallCode=2000` (`JvmArg.JvmExtendedProperty`).
+There are bunch of helpers for making list of parameters:
 ```java
 @ScenarioRunArgs
 public static List<ScenarioRun> parametersToRunWith() {
@@ -85,9 +84,9 @@ public static List<ScenarioRun> parametersToRunWith() {
 side going though all `BuilderType.values()`, size side going through [0, 1, 4, 128],
 and `-XX:FreqInlineSize` going through [325, 500]: `2 * 4 * 2 = 16` runs in total.
 If you run your scenario with `ForkingMain`, it will append additional "dimension" to
-your parameters space: `-XX:+EliminateAllocations / -XX:-EliminateAllocations`. This
+your parameters space: `-XX:+EliminateAllocations / -XX:-EliminateAllocations` (this
 is default "control" to verify is scalar replacement really in charge of cleaned
-allocations, so in this case it will be 32 runs in total
+allocations), so in this case it will be 32 runs in total
 
 As you can see, most parameters are passed in scenario code with system properties,
 as this way you could read them into `public static final` fields, which, in turn,
