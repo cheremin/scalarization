@@ -28,7 +28,7 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * @author ruslan
  *         created 01/04/16 at 00:12
  */
-public class BigObjectsAllocationScenario extends AllocationScenario {
+public class BigObjectsAllocationSCenario extends AllocationScenario {
 
 	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
 
