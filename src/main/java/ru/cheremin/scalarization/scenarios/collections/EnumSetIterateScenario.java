@@ -7,30 +7,53 @@ import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.ScenarioRunArgs;
 import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
-import static ru.cheremin.scalarization.ScenarioRun.withoutSpecificParameters;
+import static ru.cheremin.scalarization.ScenarioRun.runWithAll;
 
 /**
- * EnumSet.iterator() is scalarized successfully, at least for small enums
+ * EnumSet.iterator() is scalarized successfully, at least for small enums (size<=16)
+ * <p/>
+ * Enum70 is not scalarized (TODO RC: investigate why)
  *
- * TODO check enums > 64 elements
- *
- * EnumSet.allOf() is not scalarized. I'm still not sure why, but most probable
- * it is because of branch between RegularEnumSet/JumboEnumSet in EnumSet.noneOf(...)
- * factory method. It looks like universe.length value can't be statically evaluated
- * by JIT, and so branch can't be statically resolved, so "merge point" issue is in
- * play (see {@linkplain ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario}
- * for details)
  *
  * @author ruslan
  *         created 13.11.12 at 23:11
  */
 public class EnumSetIterateScenario extends AllocationScenario {
 
+	private final EnumSet<?> set;
+
+	{
+		switch( SIZE ) {
+			case 1: {
+				set = EnumSet.allOf( Enum1.class );
+				break;
+			}
+			case 3: {
+				set = EnumSet.allOf( Enum3.class );
+				break;
+			}
+			case 16: {
+				set = EnumSet.allOf( Enum16.class );
+				break;
+			}
+			case 70: {
+				set = EnumSet.allOf( Enum70.class );
+				break;
+			}
+			default: {
+				throw new IllegalStateException( "Unsupported size=" + SIZE );
+			}
+		}
+	}
+
 	@Override
 	public long run() {
-		final EnumSet<Enum3> set = EnumSet.allOf( Enum3.class );
+		return iterateContent( set );
+	}
+
+	private static long iterateContent( final EnumSet<?> set ) {
 		long result = 0;
-		for( final Enum3 e : set ) {
+		for( final Enum e : set ) {
 			result += e.ordinal();
 		}
 		return result;
@@ -38,10 +61,9 @@ public class EnumSetIterateScenario extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-//		return runWithAll(
-//				SIZE_KEY, 1, 3, 70
-//		);
-		return withoutSpecificParameters();
+		return runWithAll(
+				SIZE_KEY, 1, 3, 16, 70
+		);
 	}
 
 
@@ -55,6 +77,11 @@ public class EnumSetIterateScenario extends AllocationScenario {
 		THIRD
 	}
 
+	public static enum Enum16 {
+		_1, _2, _3, _4, _5, _6, _7, _8, _9, _10,
+		_11, _12, _13, _14, _15, _16
+	}
+
 	public static enum Enum70 {
 		_1, _2, _3, _4, _5, _6, _7, _8, _9, _10,
 		_11, _12, _13, _14, _15, _16, _17, _18, _19, _20,
@@ -65,4 +92,5 @@ public class EnumSetIterateScenario extends AllocationScenario {
 		_61, _62, _63, _64, _65, _66, _67, _68, _69, _70
 
 	}
+
 }
