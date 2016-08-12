@@ -99,6 +99,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSetEx<E> {
 		}
 
 		public void remove() {
+			throw new UnsupportedOperationException( "Method not implemented" );
 //            if (lastReturned == 0)
 //                throw new IllegalStateException();
 //            elements &= ~lastReturned;

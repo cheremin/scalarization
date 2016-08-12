@@ -28,12 +28,16 @@ public class AllocationBenchmarkMain {
 
 	public static final boolean CSV_OUTPUT = Boolean.getBoolean( "output.csv" );
 
+	public static final Formatters FORMATTER = Formatters.valueOf(
+			System.getProperty( "formatter", Formatters.FULL.name() )
+	);
+
 	/**
-	 * Bytes allocated in {@linkplain ThreadMXBean#getThreadAllocatedBytes(long)}for
+	 * Bytes allocated in {@linkplain ThreadMXBean#getThreadAllocatedBytes(long)} for
 	 * 2 long[1] arrays. Exact value can be in range [48..64], depends on arch(32/64)
 	 * and compressedOops usage, so I use max
 	 */
-	private static final int INFRASTRUCTURE_ALLOCATION_BYTES = 64;
+	public static final int INFRASTRUCTURE_ALLOCATION_BYTES = 64;
 
 
 	public static void main( final String[] args ) throws Exception {
@@ -48,7 +52,7 @@ public class AllocationBenchmarkMain {
 		System.out.println( "\n>>>>>>>>>>>>> START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
 		//TODO RC: print DoEscapeAnalysis enabled/disabled
 		System.out.printf(
-				"JDK: %s, JVM: %s\nOS: '%s' %s arch: %s\n",
+				"JDK: %s (%s), OS: '%s' %s arch: %s\n",
 				System.getProperty( "java.version" ),
 				System.getProperty( "java.vm.version" ),
 
@@ -63,7 +67,17 @@ public class AllocationBenchmarkMain {
 				SINGLE_BENCHMARK_TIME_MS
 		);
 
-		final BenchmarkResult[] benchmarkResults = new BenchmarkResult[RUNS];
+		final BenchmarkResult[] benchmarkResults = runBenchmarkSeries( scenario, RUNS, SINGLE_BENCHMARK_TIME_MS );
+
+		//print results
+		printResults( benchmarkResults );
+		System.out.println( "\n<<<<<<<<<<<<<<< END <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n" );
+	}
+
+	public static BenchmarkResult[] runBenchmarkSeries( final AllocationScenario scenario,
+	                                                    final int runs,
+	                                                    final long singleSeriesTimeMs ) {
+		final BenchmarkResult[] benchmarkResults = new BenchmarkResult[runs];
 		for( int i = 0; i < benchmarkResults.length; i++ ) {
 			benchmarkResults[i] = new BenchmarkResult();
 		}
@@ -71,23 +85,21 @@ public class AllocationBenchmarkMain {
 
 		final AllocationMonitor allocationMonitor = new AllocationMonitor( Thread.currentThread() );
 		allocationMonitor.storeCurrentStamps();
-		for( int i = 0; i < RUNS; i++ ) {
+		for( int i = 0; i < runs; i++ ) {
 			final BenchmarkResult benchmarkResult = benchmarkResults[i];
 
-			runBenchmark( scenario, benchmarkResult );
+			runBenchmark( scenario, benchmarkResult, singleSeriesTimeMs );
 
 			allocationMonitor.updateStampsAndStoreDifference( benchmarkResult );
 		}
-
-		//print results
-		printResults( benchmarkResults );
-		System.out.println( "\n<<<<<<<<<<<<<<< END <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n" );
+		return benchmarkResults;
 	}
 
 	private static void runBenchmark( final AllocationScenario scenario,
 	                                  /*out*/
-	                                  final BenchmarkResult benchmarkResult ) {
-		runLoop( scenario, SINGLE_BENCHMARK_TIME_MS, benchmarkResult );
+	                                  final BenchmarkResult benchmarkResult,
+	                                  final long singleBenchmarkTimeMs ) {
+		runLoop( scenario, singleBenchmarkTimeMs, benchmarkResult );
 	}
 
 	private static void runLoop( final AllocationScenario scenario,
@@ -108,84 +120,11 @@ public class AllocationBenchmarkMain {
 	}
 
 	private static void printResults( final BenchmarkResult[] results ) {
-		if( CSV_OUTPUT ) {
-			System.out.print(
-					"run #, " +
-							" allocations?, " +
-							" allocated bytes, " +
-							" iterations, " +
-							" bytes/iteration, " +
-							" GCs count, " +
-							" Total ms in GC, " +
-							" 'result'\n"
-			);
-		}
+		System.out.print( FORMATTER.header( results.length ) );
+
 		for( int i = 0; i < results.length; i++ ) {
 			final BenchmarkResult result = results[i];
-			final double bytesAllocatedPerRun = 1.0 * ( result.memoryAllocatedByThreadBytes ) / result.totalIterations;
-			final String shortDescription;
-			if( result.gcCollectionCount == 0
-					&& result.gcCollectionTime == 0
-					&& ( result.memoryAllocatedByThreadBytes <= INFRASTRUCTURE_ALLOCATION_BYTES ) ) {
-				shortDescription = "NO_ALLOCATIONS";
-			} else if( bytesAllocatedPerRun < 1 ) {
-				shortDescription = "likely NO_ALLOCATIONS";
-			} else {
-				shortDescription = "ARE_ALLOCATIONS";
-			}
-
-			if( CSV_OUTPUT ) {
-				System.out.printf(
-						"%d, %s, %d, %d, %.2f, %d , %d , %d \n",
-						i,
-						shortDescription,
-						result.memoryAllocatedByThreadBytes,
-						result.totalIterations,
-						bytesAllocatedPerRun,
-						result.gcCollectionCount,
-						result.gcCollectionTime,
-						result.benchmarkResult
-				);
-			} else {
-				System.out.printf(
-						"run[#%d]: %s. (Details: allocated %d bytes/%d iterations ~= %.2f bytes/iteration, %d GCs %d ms in total, 'result' = %d) \n",
-						i,
-						shortDescription,
-						result.memoryAllocatedByThreadBytes,
-						result.totalIterations,
-						bytesAllocatedPerRun,
-						result.gcCollectionCount,
-						result.gcCollectionTime,
-						result.benchmarkResult
-				);
-			}
-		}
-	}
-
-	public static class BenchmarkResult {
-		public long gcCollectionTime;
-		public long gcCollectionCount;
-
-		public long memoryAllocatedByThreadBytes;
-
-		/** Fake "result" to prevent dead code elimination */
-		public long benchmarkResult;
-		private long totalIterations;
-
-		public void setBenchmarkResult( final long benchmarkResult ) {
-			this.benchmarkResult = benchmarkResult;
-		}
-
-		public void setup( final long gcCollectionTime,
-		                   final long gcCollectionCount,
-		                   final long memoryAllocatedByThreadBytes ) {
-			this.gcCollectionTime = gcCollectionTime;
-			this.gcCollectionCount = gcCollectionCount;
-			this.memoryAllocatedByThreadBytes = memoryAllocatedByThreadBytes;
-		}
-
-		public void setTotalIterations( final long totalIterations ) {
-			this.totalIterations = totalIterations;
+			System.out.print( FORMATTER.format( i, result ) );
 		}
 	}
 

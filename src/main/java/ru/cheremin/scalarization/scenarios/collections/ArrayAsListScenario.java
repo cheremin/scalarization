@@ -30,9 +30,11 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * scalarized successfully. This leads me to conclusion it iterator-to-list reference
  * prevents list from scalarization.
  *
+ * See <a href="https://bugs.openjdk.java.net/browse/JDK-8155769">JDK-8155769</a> for
+ * details
+ *
  * <p/>
- * <p/>
- * TODO RC: Why array wrapper is not scalarized with iterator access?
+ *
  *
  * @author ruslan
  *         created 13.11.12 at 23:11
