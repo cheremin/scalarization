@@ -46,7 +46,7 @@ public abstract class JvmArg {
 	private static final Pattern XX_OPTIONS_PATTERN = Pattern.compile( "-XX:([+-])?([\\w\\d]+)(?:=(.+))?" );
 
 	/** There are more, but I do not care of them right now */
-	private static final String[] JVM_PROPERTIES_NAMES = new String[] {
+	private static final String[] JVM_PROPERTIES_NAMES = {
 			"-Xmx", "-Xms", "-Xss", "-Xbatch",
 
 			"-server", "-client", "-d64",
@@ -89,6 +89,7 @@ public abstract class JvmArg {
 		return null;
 	}
 
+	/** -Dname=value */
 	@Immutable
 	public static class SystemProperty extends JvmArg {
 		private final String value;
@@ -116,6 +117,22 @@ public abstract class JvmArg {
 		}
 	}
 
+
+	/**
+	 * name[value]
+	 * <p/>
+	 * This is most un-categorized properties, e.g.
+	 * -agentlib:...
+	 * -ea
+	 * -Xmx128m
+	 * -d64
+	 * <p/>
+	 * <p/>
+	 * To put them all into one category, I've decided to use relaxed format: i.e.
+	 * everything in "-agentlib:" is treated as a name, including '-' and ':', and
+	 * everything following treated as value. This requires to have all possible 'names'
+	 * listed, so {@linkplain #JVM_PROPERTIES_NAMES}
+	 */
 	@Immutable
 	public static class JvmProperty extends JvmArg {
 		private final String value;
@@ -139,6 +156,7 @@ public abstract class JvmArg {
 		}
 	}
 
+	/** -XX:[+/-]property */
 	@Immutable
 	public static class JvmExtendedFlag extends JvmArg {
 		private final boolean value;
@@ -165,6 +183,7 @@ public abstract class JvmArg {
 		}
 	}
 
+	/** -XX:property[=value] */
 	@Immutable
 	public static class JvmExtendedProperty extends JvmArg {
 		private final String value;

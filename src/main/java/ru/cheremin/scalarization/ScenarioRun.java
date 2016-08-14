@@ -5,7 +5,6 @@ import java.util.*;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import ru.cheremin.scalarization.infra.JvmArg;
-import ru.cheremin.scalarization.scenarios.AllocationScenario;
 
 /**
  * List of additional jvm args to run specific scenario with.

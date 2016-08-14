@@ -1,12 +1,17 @@
 package ru.cheremin.scalarization.junit;
 
+import java.io.IOException;
+import java.util.*;
+
 import org.hamcrest.*;
-import ru.cheremin.scalarization.infra.BenchmarkResult;
-import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.AllocationScenario;
+import ru.cheremin.scalarization.infra.BenchmarkResults;
+import ru.cheremin.scalarization.infra.BenchmarkResults.IterationResult;
+import ru.cheremin.scalarization.infra.Formatters;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static ru.cheremin.scalarization.infra.AllocationBenchmarkMain.INFRASTRUCTURE_ALLOCATION_BYTES;
-import static ru.cheremin.scalarization.infra.AllocationBenchmarkMain.runBenchmarkSeries;
+import static ru.cheremin.scalarization.infra.AllocationBenchmarkBuilder.AllocationMonitor.INFRASTRUCTURE_ALLOCATION_BYTES;
+import static ru.cheremin.scalarization.infra.AllocationBenchmarkBuilder.forScenario;
 
 /**
  * @author ruslan
@@ -14,13 +19,17 @@ import static ru.cheremin.scalarization.infra.AllocationBenchmarkMain.runBenchma
  */
 public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatcher.Scenario> {
 
-	private final int runs = 12;
-	private final long singleRunTimeMs = 3000;
+	private static final int DEFAULT_ITERATIONS = Integer.getInteger( "allocation-matcher.iterations", 12 );
+	private static final int DEFAULT_ITERATION_DURATION_MS = Integer.getInteger( "allocation-matcher.iteration-duration-ms", 3000 );
+
+	private final int iterations = DEFAULT_ITERATIONS;
+	private final long iterationDurationMs = DEFAULT_ITERATION_DURATION_MS;
+	private final BenchmarkResults.Formatter formatter = Formatters.FULL;
 
 
-	private final Matcher<BenchmarkResult[]> benchmarkResultsMatcher;
+	private final Matcher<BenchmarkResults> benchmarkResultsMatcher;
 
-	public AllocationMatcher( final Matcher<BenchmarkResult[]> benchmarkResultsMatcher ) {
+	public AllocationMatcher( final Matcher<BenchmarkResults> benchmarkResultsMatcher ) {
 		checkArgument( benchmarkResultsMatcher != null, "benchmarkResultsMatcher can't be null" );
 		this.benchmarkResultsMatcher = benchmarkResultsMatcher;
 	}
@@ -28,16 +37,17 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 	@Override
 	protected boolean matchesSafely( final Scenario scenario,
 	                                 final Description mismatch ) {
-		final BenchmarkResult[] benchmarkResults = runBenchmarkSeries(
-				new AllocationScenario() {
-					@Override
-					public long run() {
-						return scenario.run();
-					}
-				},
-				runs,
-				singleRunTimeMs
-		);
+		final AllocationScenario allocationScenario = new AllocationScenario() {
+			@Override
+			public long run() {
+				return scenario.run();
+			}
+		};
+		final BenchmarkResults benchmarkResults = forScenario( allocationScenario )
+				.withIterationDurationMs( iterationDurationMs )
+				.withIterations( iterations )
+				.run();
+
 
 //		final BenchmarkResult lastResult = benchmarkResults[benchmarkResults.length - 1];
 //		final double bytesAllocatedPerLastRun = 1.0 * ( lastResult.memoryAllocatedByThreadBytes ) / lastResult.totalIterations;
@@ -48,6 +58,18 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 					.appendText( " allocations ~ [" );
 			benchmarkResultsMatcher.describeMismatch( benchmarkResults, mismatch );
 			mismatch.appendText( "]" );
+
+			if( formatter != null ) {
+				try {
+					final StringBuilder sb = new StringBuilder();
+					formatter.format( benchmarkResults, sb );
+
+					mismatch.appendText( "\nDetailed log: \n" );
+					mismatch.appendText( sb.toString() );
+				} catch( IOException e ) {
+					throw new AssertionError( "IO exception should not happen with StringBuilder", e );
+				}
+			}
 			return false;
 		}
 	}
@@ -59,28 +81,29 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 				.appendText( "]" );
 	}
 
-	public static AllocationMatcher lastRun( final Matcher<BenchmarkResult> lastRunResultMatcher ) {
-		return new AllocationMatcher( new FeatureMatcher<BenchmarkResult[], BenchmarkResult>(
+	public static AllocationMatcher lastIteration( final Matcher<IterationResult> lastRunResultMatcher ) {
+		return new AllocationMatcher( new FeatureMatcher<BenchmarkResults, IterationResult>(
 				lastRunResultMatcher,
 				"last benchmark",
 				"last benchmark result"
 		) {
 			@Override
-			protected BenchmarkResult featureValueOf( final BenchmarkResult[] actual ) {
-				return actual[actual.length - 1];
+			protected IterationResult featureValueOf( final BenchmarkResults results ) {
+				final List<IterationResult> iterationResults = results.iterationResults();
+				return iterationResults.get( iterationResults.size() - 1 );
 			}
 		} );
 	}
 
-	public static AllocationMatcher allocatesPerRun( final Matcher<Number> allocatedBytesPerRunMatcher ) {
-		return lastRun(
-				new FeatureMatcher<BenchmarkResult, Number>(
+	public static AllocationMatcher allocatesPerTurn( final Matcher<Number> allocatedBytesPerRunMatcher ) {
+		return lastIteration(
+				new FeatureMatcher<IterationResult, Number>(
 						allocatedBytesPerRunMatcher,
 						"allocated bytes/run",
 						"allocated bytes/run"
 				) {
 					@Override
-					protected Number featureValueOf( final BenchmarkResult actual ) {
+					protected Number featureValueOf( final IterationResult actual ) {
 						return actual.memoryAllocatedByThreadBytes / actual.totalIterations;
 					}
 				}
@@ -88,9 +111,9 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 	}
 
 	public static AllocationMatcher allocatesNothing() {
-		return lastRun( new TypeSafeDiagnosingMatcher<BenchmarkResult>() {
+		return lastIteration( new TypeSafeDiagnosingMatcher<IterationResult>() {
 			@Override
-			protected boolean matchesSafely( final BenchmarkResult result,
+			protected boolean matchesSafely( final IterationResult result,
 			                                 final Description mismatch ) {
 				if( result.gcCollectionCount == 0
 						&& result.gcCollectionTime == 0
@@ -116,9 +139,9 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 	}
 
 	public static AllocationMatcher allocatesSomething() {
-		return lastRun( new TypeSafeDiagnosingMatcher<BenchmarkResult>() {
+		return lastIteration( new TypeSafeDiagnosingMatcher<IterationResult>() {
 			@Override
-			protected boolean matchesSafely( final BenchmarkResult result,
+			protected boolean matchesSafely( final IterationResult result,
 			                                 final Description mismatch ) {
 				if( ( result.memoryAllocatedByThreadBytes > INFRASTRUCTURE_ALLOCATION_BYTES ) ) {
 					return true;
@@ -142,7 +165,7 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 		} );
 	}
 
-	//TODO RC: AllocationMatcherBuilder.runs(12)
+	//TODO RC: AllocationMatcherBuilder.iterations(12)
 	//                                 .secondsEach(3)
 	//                                 .finallyAllocatesNothing();
 

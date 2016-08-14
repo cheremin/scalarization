@@ -16,9 +16,8 @@ import com.google.common.io.Files;
 import org.reflections.Reflections;
 import ru.cheremin.scalarization.infra.AllocationBenchmarkMain;
 import ru.cheremin.scalarization.infra.JvmArg.JvmExtendedFlag;
-import ru.cheremin.scalarization.infra.MultiplexingOutputStream;
-import ru.cheremin.scalarization.infra.ScenarioRunner;
-import ru.cheremin.scalarization.scenarios.AllocationScenario;
+import ru.cheremin.scalarization.infra.internal.MultiplexingOutputStream;
+import ru.cheremin.scalarization.infra.internal.ScenarioRunner;
 
 /**
  *
@@ -46,7 +45,7 @@ public class ForkingMain {
 	 * <p/>
 	 * -Dscenario = [className extends AllocationScenario] -- profile single class
 	 * <p/>
-	 * -Dscenario.auto-discover-in = [class name pattern]  -- profile all scenarios
+	 * -Dscenario.auto-discover-in = [class name pattern]  -- profile all lab
 	 * matched with pattern
 	 * <p/>
 	 * -Dtarget-directory = [path]                         -- store results in files
@@ -61,11 +60,11 @@ public class ForkingMain {
 		}
 
 		if( AUTODISCOVER_ALL_SCENARIOS_IN != null ) {
-			System.out.printf( "Auto-discovering scenarios in '" + AUTODISCOVER_ALL_SCENARIOS_IN + "': \n" );
+			System.out.printf( "Auto-discovering lab in '" + AUTODISCOVER_ALL_SCENARIOS_IN + "': \n" );
 
 			final List<Class<? extends AllocationScenario>> allocationScenarioClasses = lookupScenarios( AUTODISCOVER_ALL_SCENARIOS_IN );
 			//TODO RC: print ScenarioRuns count right after class names here
-			System.out.printf( "Found scenarios: \n" + Joiner.on( "\n" ).join( allocationScenarioClasses ) + " \n\n" );
+			System.out.printf( "Found lab: \n" + Joiner.on( "\n" ).join( allocationScenarioClasses ) + " \n\n" );
 
 			for( final Class<? extends AllocationScenario> allocationScenarioClass : allocationScenarioClasses ) {
 				if( !Modifier.isAbstract( allocationScenarioClass.getModifiers() ) ) {

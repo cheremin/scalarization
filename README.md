@@ -15,18 +15,18 @@ mvn clean package
 chmod u+x scripts/run-all.sh
 scripts/run-all.sh [results folder]
 ```
-This will run _all_ scenarios under `ru.cheremin.scalarization.scenarios` package, for
+This will run _all_ scenarios under `ru.cheremin.scalarization.lab` package, for
 all parameters space. Results will be stored in `results` folder, file per scenario.
 But this will take quite long: *~10 hours* right now on my laptop.
 
 More targeted run will look like this:
 ```bash
 $JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server  ...\
-		-Dscenario=ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario \
+		-Dscenario=ru.cheremin.scalarization.lab.plain.ControlFlowScenario \
 		-Dtarget-directory=results \
 		 -jar target/benchmarks.jar
 ```
-This will run specific scenario (`ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario`)
+This will run specific scenario (`ru.cheremin.scalarization.lab.plain.ControlFlowScenario`)
 for all parameters space, which is not too big for this scenario, so it takes only
 10-15 minutes. If you want to run from IDE, you should use `ru.cheremin.scalarization.ForkingMain`
 as main class, with all parameters above
@@ -34,7 +34,7 @@ as main class, with all parameters above
 And most targeted run will look like this:
 ```bash
 $JAVA_HOME/bin/java -Xmx64m -Xms64m -XX:+UseSerialGC -server ...\
-		-Dscenario=ru.cheremin.scalarization.scenarios.plain.ControlFlowScenario \
+		-Dscenario=ru.cheremin.scalarization.lab.plain.ControlFlowScenario \
 		-Dscenario.use-type=ACCUMULATE_IN_LOOP \
 		-Dscenario.size=0 \
  		 -cp target/benchmarks.jar \
@@ -47,7 +47,7 @@ different for each scenario (`scenario.size` is more or less universal, it is us
 many, but not all, scenarios)
 
 ## How to create scenario ##
-Scenario is a class, which extends `ru.cheremin.scalarization.scenarios.AllocationScenario`.
+Scenario is a class, which extends `ru.cheremin.scalarization.AllocationScenario`.
 You can pause at this point in the beginning, and try. Without parameters, there is
 little difference between running scenario with `ForkingMain` or `AllocationBenchmarkMain`
 runners, so better to run with `AllocationBenchmarkMain`, since it allows you to debug
