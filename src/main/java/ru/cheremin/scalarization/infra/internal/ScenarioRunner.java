@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 import com.google.common.base.Predicate;
 import com.google.common.io.ByteSink;
-import ru.cheremin.scalarization.AllocationScenario;
+import ru.cheremin.scalarization.Scenario;
 import ru.cheremin.scalarization.ScenarioRun;
 import ru.cheremin.scalarization.infra.AllocationBenchmarkMain;
 import ru.cheremin.scalarization.infra.JvmArg;
@@ -35,16 +35,17 @@ public class ScenarioRunner {
 
 	private final ScenarioRun[] extendedRunArguments;
 
-	private final Class<? extends AllocationScenario> scenarioClass;
+	private final Class<? extends Scenario> scenarioClass;
 	private final ByteSink reportTo;
 
-	public ScenarioRunner( final Class<? extends AllocationScenario> scenarioClass,
+	public ScenarioRunner( final Class<? extends Scenario> scenarioClass,
 	                       final ByteSink reportTo,
 	                       final ScenarioRun[] extendedRunArguments ) throws IllegalAccessException, InstantiationException {
 		checkArgument( scenarioClass != null, "scenarioClass can't be null" );
 		checkArgument( reportTo != null, "reportTo can't be null" );
-		//just to check class have 0-arg ctor and can be cast to AllocationScenario
-		final AllocationScenario scenario = scenarioClass.newInstance();
+
+		//just to check class have 0-arg ctor and can be cast to Scenario
+		final Scenario scenario = scenarioClass.newInstance();
 
 
 		this.scenarioClass = scenarioClass;

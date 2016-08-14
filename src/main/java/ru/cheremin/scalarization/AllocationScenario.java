@@ -1,17 +1,19 @@
 package ru.cheremin.scalarization;
 
 /**
+ * Typical scenario extends this class
+ *
  * @author ruslan
  *         created 09/02/16 at 12:36
  */
-public abstract class AllocationScenario {
+public abstract class AllocationScenario implements Scenario{
 	public static final String SIZE_KEY = "scenario.size";
 
 	public static final int SIZE = Integer.getInteger( SIZE_KEY, 16 );
 
 	public abstract long run();
 
-	public String additionalInfo() {
+	protected String additionalInfo() {
 		return "";
 	}
 

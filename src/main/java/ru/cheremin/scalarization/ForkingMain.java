@@ -20,7 +20,6 @@ import ru.cheremin.scalarization.infra.internal.MultiplexingOutputStream;
 import ru.cheremin.scalarization.infra.internal.ScenarioRunner;
 
 /**
- *
  * @author ruslan
  *         created 23/02/16 at 19:41
  */
@@ -35,9 +34,9 @@ public class ForkingMain {
 //			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", true ) ),
 //			new ScenarioRun( new JvmExtendedFlag( "DoEscapeAnalysis", false ) )
 
-			new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", true ) ),
-			new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", false ) )
-			//TODO: add -server/-client?
+new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", true ) ),
+new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", false ) )
+//TODO: add -server/-client?
 	};
 
 	/**
@@ -51,7 +50,7 @@ public class ForkingMain {
 	 * -Dtarget-directory = [path]                         -- store results in files
 	 * in the directory. Files are created one-per-scenario. (Output also duplicated
 	 * to stdout)
-	 *
+	 * <p/>
 	 * All parameters passed to JVM will be copied and used to start forked JVM
 	 */
 	public static void main( final String[] args ) throws Exception {
@@ -62,18 +61,18 @@ public class ForkingMain {
 		if( AUTODISCOVER_ALL_SCENARIOS_IN != null ) {
 			System.out.printf( "Auto-discovering lab in '" + AUTODISCOVER_ALL_SCENARIOS_IN + "': \n" );
 
-			final List<Class<? extends AllocationScenario>> allocationScenarioClasses = lookupScenarios( AUTODISCOVER_ALL_SCENARIOS_IN );
+			final List<Class<? extends Scenario>> allocationScenarioClasses = lookupScenarios( AUTODISCOVER_ALL_SCENARIOS_IN );
 			//TODO RC: print ScenarioRuns count right after class names here
 			System.out.printf( "Found lab: \n" + Joiner.on( "\n" ).join( allocationScenarioClasses ) + " \n\n" );
 
-			for( final Class<? extends AllocationScenario> allocationScenarioClass : allocationScenarioClasses ) {
+			for( final Class<? extends Scenario> allocationScenarioClass : allocationScenarioClasses ) {
 				if( !Modifier.isAbstract( allocationScenarioClass.getModifiers() ) ) {
 					runScenario( allocationScenarioClass );
 				}
 			}
 		} else if( SCENARIO_CLASS_NAME != null ) {
 			final Class<?> clazz = Class.forName( SCENARIO_CLASS_NAME );
-			runScenario( ( Class<AllocationScenario> ) clazz );
+			runScenario( ( Class<? extends Scenario> ) clazz );
 		} else {
 			System.err.println( "'scenario.auto-discover-in' or 'scenario' must be set" );
 			System.exit( -1 );
@@ -81,7 +80,7 @@ public class ForkingMain {
 
 	}
 
-	private static void runScenario( final Class<? extends AllocationScenario> scenarioClass ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, InterruptedException, ExecutionException {
+	private static void runScenario( final Class<? extends Scenario> scenarioClass ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, InterruptedException, ExecutionException {
 
 		final File scenarioOutputFile = new File(
 				TARGET_DIRECTORY,
@@ -106,15 +105,15 @@ public class ForkingMain {
 		scenarioRunner.run();
 	}
 
-	private static List<Class<? extends AllocationScenario>> lookupScenarios( final String autodiscoverAllScenariosIn ) {
+	private static List<Class<? extends Scenario>> lookupScenarios( final String autodiscoverAllScenariosIn ) {
 		final Reflections reflections = new Reflections( autodiscoverAllScenariosIn );
-		final List<Class<? extends AllocationScenario>> allocationScenarioClasses =
-				Lists.newArrayList( reflections.getSubTypesOf( AllocationScenario.class ) );
+		final List<Class<? extends Scenario>> allocationScenarioClasses =
+				Lists.newArrayList( reflections.getSubTypesOf( Scenario.class ) );
 		//sort just to have stable order
-		Collections.sort( allocationScenarioClasses, new Ordering<Class<? extends AllocationScenario>>() {
+		Collections.sort( allocationScenarioClasses, new Ordering<Class<? extends Scenario>>() {
 			@Override
-			public int compare( final Class<? extends AllocationScenario> left,
-			                    final Class<? extends AllocationScenario> right ) {
+			public int compare( final Class<? extends Scenario> left,
+			                    final Class<? extends Scenario> right ) {
 				return left.getCanonicalName().compareTo( right.getCanonicalName() );
 			}
 		} );

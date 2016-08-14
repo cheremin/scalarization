@@ -7,7 +7,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.base.Throwables;
 import com.sun.management.GarbageCollectorMXBean;
 import com.sun.management.ThreadMXBean;
-import ru.cheremin.scalarization.AllocationScenario;
+import ru.cheremin.scalarization.Scenario;
 import ru.cheremin.scalarization.infra.BenchmarkResults.IterationResult;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -21,20 +21,20 @@ public class AllocationBenchmarkBuilder {
 
 	private static final int ITERATIONS_IN_BATCH = Integer.getInteger( "iterations-in-batch", 1024 );
 
-	private final Supplier<AllocationScenario> scenarioSupplier;
+	private final Supplier<Scenario> scenarioSupplier;
 
 	private long iterationDurationMs = 3000;
 	private int iterations = 12;
 
-	private AllocationBenchmarkBuilder( final Supplier<AllocationScenario> scenarioSupplier ) {
+	private AllocationBenchmarkBuilder( final Supplier<Scenario> scenarioSupplier ) {
 		checkArgument( scenarioSupplier != null, "scenarioSupplier can't be null" );
 		this.scenarioSupplier = scenarioSupplier;
 	}
 
-	public static AllocationBenchmarkBuilder forScenario( final Class<? extends AllocationScenario> scenarioClass ) {
-		return new AllocationBenchmarkBuilder( new Supplier<AllocationScenario>() {
+	public static AllocationBenchmarkBuilder forScenario( final Class<? extends Scenario> scenarioClass ) {
+		return new AllocationBenchmarkBuilder( new Supplier<Scenario>() {
 			@Override
-			public AllocationScenario get() {
+			public Scenario get() {
 				try {
 					return scenarioClass.newInstance();
 				} catch( Exception e ) {
@@ -44,7 +44,7 @@ public class AllocationBenchmarkBuilder {
 		} );
 	}
 
-	public static AllocationBenchmarkBuilder forScenario( final AllocationScenario scenario ) {
+	public static AllocationBenchmarkBuilder forScenario( final Scenario scenario ) {
 		return new AllocationBenchmarkBuilder( Suppliers.ofInstance( scenario ) );
 	}
 
@@ -62,8 +62,8 @@ public class AllocationBenchmarkBuilder {
 		checkState( iterationDurationMs > 0, "iterationDurationMs(%s) must be >0", iterationDurationMs );
 		checkState( iterations > 0, "iterations(%s) must be >0", iterations );
 
-		final AllocationScenario scenario = scenarioSupplier.get();
-		checkState( scenario !=null, "scenarioSupplier.get() must not be null" );
+		final Scenario scenario = scenarioSupplier.get();
+		checkState( scenario != null, "scenarioSupplier.get() must not be null" );
 
 		final String scenarioName = scenario.toString();
 		final SingleIterationResult[] iterationResults = runIterations(
@@ -82,7 +82,7 @@ public class AllocationBenchmarkBuilder {
 
 	/* ================================= infra =================================== */
 
-	private static SingleIterationResult[] runIterations( final AllocationScenario scenario,
+	private static SingleIterationResult[] runIterations( final Scenario scenario,
 	                                                      final int iterations,
 	                                                      final long singleIterationDurationMs ) {
 		final SingleIterationResult[] iterationResults = new SingleIterationResult[iterations];
@@ -103,7 +103,7 @@ public class AllocationBenchmarkBuilder {
 		return iterationResults;
 	}
 
-	private static void runIteration( final AllocationScenario scenario,
+	private static void runIteration( final Scenario scenario,
 	                                  final long singleIterationDurationMs,
 	                                  /*out*/
 	                                  final SingleIterationResult iterationResult ) {

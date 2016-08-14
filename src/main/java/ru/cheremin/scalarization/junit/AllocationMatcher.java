@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.hamcrest.*;
-import ru.cheremin.scalarization.AllocationScenario;
+import ru.cheremin.scalarization.Scenario;
 import ru.cheremin.scalarization.infra.BenchmarkResults;
 import ru.cheremin.scalarization.infra.BenchmarkResults.IterationResult;
 import ru.cheremin.scalarization.infra.Formatters;
@@ -17,7 +17,7 @@ import static ru.cheremin.scalarization.infra.AllocationBenchmarkBuilder.forScen
  * @author ruslan
  *         created 07/08/16 at 16:01
  */
-public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatcher.Scenario> {
+public class AllocationMatcher extends TypeSafeDiagnosingMatcher<Scenario> {
 
 	private static final int DEFAULT_ITERATIONS = Integer.getInteger( "allocation-matcher.iterations", 12 );
 	private static final int DEFAULT_ITERATION_DURATION_MS = Integer.getInteger( "allocation-matcher.iteration-duration-ms", 3000 );
@@ -37,13 +37,7 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 	@Override
 	protected boolean matchesSafely( final Scenario scenario,
 	                                 final Description mismatch ) {
-		final AllocationScenario allocationScenario = new AllocationScenario() {
-			@Override
-			public long run() {
-				return scenario.run();
-			}
-		};
-		final BenchmarkResults benchmarkResults = forScenario( allocationScenario )
+		final BenchmarkResults benchmarkResults = forScenario( scenario )
 				.withIterationDurationMs( iterationDurationMs )
 				.withIterations( iterations )
 				.run();
@@ -169,7 +163,4 @@ public class AllocationMatcher extends TypeSafeDiagnosingMatcher<AllocationMatch
 	//                                 .secondsEach(3)
 	//                                 .finallyAllocatesNothing();
 
-	public interface Scenario {
-		public long run();
-	}
 }

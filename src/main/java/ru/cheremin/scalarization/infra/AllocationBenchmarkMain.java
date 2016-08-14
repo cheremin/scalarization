@@ -1,7 +1,9 @@
 package ru.cheremin.scalarization.infra;
 
 import org.apache.commons.lang3.StringUtils;
-import ru.cheremin.scalarization.AllocationScenario;
+import ru.cheremin.scalarization.Scenario;
+
+import static ru.cheremin.scalarization.infra.AllocationBenchmarkBuilder.forScenario;
 
 
 /**
@@ -18,7 +20,7 @@ public class AllocationBenchmarkMain {
 	public static final String SCENARIO_CLASS_KEY = "scenario";
 	public static final String SCENARIO_CLASS_NAME = System.getProperty( SCENARIO_CLASS_KEY );
 
-	public static final int SINGLE_ITERATION_TIME_MS = Integer.getInteger( "duration", 3000 );
+	public static final int SINGLE_ITERATION_DURATION_MS = Integer.getInteger( "duration", 3000 );
 	public static final int ITERATIONS = Integer.getInteger( "runs", 12 );
 
 	public static final Formatters FORMATTER = Formatters.valueOf(
@@ -33,7 +35,7 @@ public class AllocationBenchmarkMain {
 		}
 
 		final Class<?> clazz = Class.forName( SCENARIO_CLASS_NAME );
-		final AllocationScenario scenario = ( AllocationScenario ) clazz.newInstance();
+		final Scenario scenario = ( Scenario ) clazz.newInstance();
 
 		System.out.println( "\n>>>>>>>>>>>>> START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" );
 		//TODO RC: print DoEscapeAnalysis/EliminateAllocations enabled/disabled
@@ -50,12 +52,12 @@ public class AllocationBenchmarkMain {
 				"%s: %d runs, %d ms each\n",
 				scenario,
 				ITERATIONS,
-				SINGLE_ITERATION_TIME_MS
+				SINGLE_ITERATION_DURATION_MS
 		);
 
-		final BenchmarkResults benchmarkResults = AllocationBenchmarkBuilder.forScenario( scenario )
+		final BenchmarkResults benchmarkResults = forScenario( scenario )
 				.withIterations( ITERATIONS )
-				.withIterationDurationMs( SINGLE_ITERATION_TIME_MS )
+				.withIterationDurationMs( SINGLE_ITERATION_DURATION_MS )
 				.run();
 
 		FORMATTER.format( benchmarkResults, System.out );

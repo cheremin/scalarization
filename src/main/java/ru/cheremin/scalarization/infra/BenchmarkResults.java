@@ -14,14 +14,14 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class BenchmarkResults {
 	private final String scenarioName;
-	private final ImmutableList<IterationResult> results;
+	private final ImmutableList<IterationResult> iterationResults;
 
 	public BenchmarkResults( final String scenarioName,
-	                         final IterationResult[] results ) {
+	                         final IterationResult[] iterationResults ) {
 		checkArgument( scenarioName != null, "scenarioName can't be null" );
-		checkArgument( results != null && results.length > 0, "results can't be null nor empty" );
+		checkArgument( iterationResults != null && iterationResults.length > 0, "iterationResults can't be null nor empty" );
 		this.scenarioName = scenarioName;
-		this.results = ImmutableList.copyOf( results );
+		this.iterationResults = ImmutableList.copyOf( iterationResults );
 	}
 
 	public String scenarioName() {
@@ -29,7 +29,7 @@ public class BenchmarkResults {
 	}
 
 	public List<IterationResult> iterationResults() {
-		return results;
+		return iterationResults;
 
 	}
 

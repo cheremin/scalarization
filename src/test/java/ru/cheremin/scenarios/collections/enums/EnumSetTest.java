@@ -7,7 +7,7 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import ru.cheremin.scalarization.junit.AllocationMatcher.Scenario;
+import ru.cheremin.scalarization.Scenario;
 import ru.cheremin.scalarization.lab.collections.enums.SampleEnums.Enum1;
 import ru.cheremin.scalarization.lab.collections.enums.SampleEnums.Enum16;
 import ru.cheremin.scalarization.lab.collections.enums.SampleEnums.Enum3;
