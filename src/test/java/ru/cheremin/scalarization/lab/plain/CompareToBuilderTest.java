@@ -14,7 +14,7 @@ import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesSomethi
 public class CompareToBuilderTest {
 
 	@Test
-	public void hasCodeBuilderIsScalarized() throws Exception {
+	public void compareToBuilderIsNOTScalarized() throws Exception {
 		assertThat(
 				new Scenario() {
 					@Override

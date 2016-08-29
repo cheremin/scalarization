@@ -17,7 +17,11 @@ public class Utils {
 
 	public static Pool<String> randomStringsPool( final int universeSize ) {
 		final String[] strings = generateStringArray( universeSize );
-		return new Pool<>( strings );
+		return poolOf( strings );
+	}
+
+	public static <T> Pool<T> poolOf( final T[] items ) {
+		return new Pool<>( items );
 	}
 
 	public static class Pool<T> {
@@ -38,7 +42,7 @@ public class Utils {
 	}
 
 	public static class BytecodePadder {
-		private long value;
+		private volatile long value;
 
 		public void pad() {
 			//code is taken from Blackhole with small mods. The idea is similar, but
@@ -46,6 +50,8 @@ public class Utils {
 			//  need "JIT-unpredictable" side-effect. But I do not need to spent CPU
 			//  cycles, I just need to insert some amount of bytecodes, which can't
 			//  be removed
+			// I'm not sure is JIT able to "compress" code (i.e. merge few calls
+			//  into 1 with cumulative effect). Hope volatile prevents this
 			value = ( value * 0x5DEECE66DL + 0xBL ) & ( 0xFFFFFFFFFFFFL );
 		}
 
