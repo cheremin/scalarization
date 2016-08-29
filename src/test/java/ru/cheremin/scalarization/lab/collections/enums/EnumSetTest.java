@@ -1,4 +1,4 @@
-package ru.cheremin.scenarios.collections.enums;
+package ru.cheremin.scalarization.lab.collections.enums;
 
 import java.util.*;
 

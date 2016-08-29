@@ -32,9 +32,7 @@ public class NewRunnableScenario extends AllocationScenario {
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
-		return Arrays.asList(
-				ScenarioRun.runWith( SIZE_KEY, -1 )
-		);
+		return ScenarioRun.withoutSpecificParameters();
 	}
 
 

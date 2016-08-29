@@ -1,4 +1,4 @@
-package ru.cheremin.scenarios.collections;
+package ru.cheremin.scalarization.lab.collections;
 
 import java.util.*;
 
