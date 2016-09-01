@@ -22,7 +22,7 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * In contrast, with constant-index access ("unrolled loop") array is scalarized up
  * to size=64 (inclusive).
  * <p/>
- * It is important to note: for long arrays it is hard to write constant-index access
+ * It is important to note: for large arrays it is hard to write constant-index access
  * code which will touch _all_ arrays cells, because such code will be big, and it will
  * breach inlining limits, but without inlining scalarization is dead. So I cheat: I
  * access all cells only for short arrays (<10), and for longer arrays I access only
@@ -42,7 +42,7 @@ public class FixedSizeObjectArrayScenario extends AllocationScenario {
 	private static final String VECTORIZED_ACCESS_KEY = "scenario.vectorized-array-access";
 	private static final boolean VECTORIZED = Boolean.getBoolean( VECTORIZED_ACCESS_KEY );
 
-	private static final Integer ONE = Integer.valueOf( 1 );
+	private static final Integer ONE = 1;
 
 	@Override
 	public long run() {

@@ -6,8 +6,8 @@ import ru.cheremin.scalarization.Scenario;
 import ru.cheremin.scalarization.lab.Utils.Pool;
 
 import static org.junit.Assert.assertThat;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesNothing;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesSomething;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesNothing;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesSomething;
 import static ru.cheremin.scalarization.lab.Utils.randomStringsPool;
 import static ru.cheremin.scalarization.lab.plain.ReturnTupleScenario.TupleType.*;
 
@@ -29,7 +29,7 @@ public class ReturnTupleTest {
 						return hash( tuple );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -43,7 +43,7 @@ public class ReturnTupleTest {
 						return hash( tuple );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -57,7 +57,7 @@ public class ReturnTupleTest {
 						return hash( tuple );
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 	}
 
@@ -71,7 +71,7 @@ public class ReturnTupleTest {
 						return hash( tuple );
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 	}
 
@@ -85,7 +85,7 @@ public class ReturnTupleTest {
 						return hash( tuple );
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 	}
 
@@ -99,7 +99,7 @@ public class ReturnTupleTest {
 						return hash( tuple );
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 	}
 

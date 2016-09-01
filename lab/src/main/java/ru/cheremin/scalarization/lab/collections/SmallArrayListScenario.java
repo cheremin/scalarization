@@ -17,7 +17,7 @@ public class SmallArrayListScenario extends AllocationScenario {
 
 	@Override
 	public long run() {
-		final ArrayList list = new ArrayList( SIZE );
+		final ArrayList<String> list = new ArrayList<>( SIZE );
 		for( int i = 0; i < SIZE; i++ ) {
 			list.add( "" );
 		}

@@ -5,7 +5,7 @@ import org.junit.Test;
 import ru.cheremin.scalarization.Scenario;
 
 import static org.junit.Assert.assertThat;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesNothing;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesNothing;
 
 /**
  * @author ruslan
@@ -28,7 +28,7 @@ public class HashCodeBuilderTest {
 								.toHashCode();
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 }

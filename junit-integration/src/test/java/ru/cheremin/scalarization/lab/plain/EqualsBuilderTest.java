@@ -5,8 +5,8 @@ import org.junit.Test;
 import ru.cheremin.scalarization.Scenario;
 
 import static org.junit.Assert.assertThat;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesNothing;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesSomething;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesNothing;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesSomething;
 
 /**
  * @author ruslan
@@ -27,7 +27,7 @@ public class EqualsBuilderTest {
 								.isEquals() ? 1 : 0;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -42,7 +42,7 @@ public class EqualsBuilderTest {
 								.isEquals() ? 1 : 0;
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 	}
 
@@ -57,7 +57,7 @@ public class EqualsBuilderTest {
 								.isEquals() ? 1 : 0;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 }

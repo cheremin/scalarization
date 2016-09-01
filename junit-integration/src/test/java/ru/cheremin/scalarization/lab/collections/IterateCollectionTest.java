@@ -7,7 +7,7 @@ import org.junit.Test;
 import ru.cheremin.scalarization.Scenario;
 
 import static org.junit.Assert.assertThat;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesNothing;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesNothing;
 
 /**
  * @author ruslan
@@ -18,7 +18,7 @@ public class IterateCollectionTest {
 
 	@Test
 	public void arrayListIteratorIsScalarized() throws Exception {
-		final List<Integer> arrayList = new ArrayList<Integer>();
+		final List<Integer> arrayList = new ArrayList<>();
 		for( int i = 0; i < SIZE; i++ ) {
 			arrayList.add( i );
 		}
@@ -26,20 +26,16 @@ public class IterateCollectionTest {
 				new Scenario() {
 					@Override
 					public long run() {
-						long sum = 0;
-						for( final Integer i : arrayList ) {
-							sum += i;
-						}
-						return sum;
+						return summarize( arrayList );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
 	@Test
 	public void linkedListIteratorIsScalarized() throws Exception {
-		final List<Integer> linkedList = new LinkedList<Integer>();
+		final List<Integer> linkedList = new LinkedList<>();
 		for( int i = 0; i < SIZE; i++ ) {
 			linkedList.add( i );
 		}
@@ -47,20 +43,16 @@ public class IterateCollectionTest {
 				new Scenario() {
 					@Override
 					public long run() {
-						long sum = 0;
-						for( final Integer i : linkedList ) {
-							sum += i;
-						}
-						return sum;
+						return summarize( linkedList );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
 	@Test
 	public void hashSetIteratorIsScalarized() throws Exception {
-		final Collection<Integer> hashSet = new HashSet<Integer>();
+		final Collection<Integer> hashSet = new HashSet<>();
 		for( int i = 0; i < SIZE; i++ ) {
 			hashSet.add( i );
 		}
@@ -68,20 +60,16 @@ public class IterateCollectionTest {
 				new Scenario() {
 					@Override
 					public long run() {
-						long sum = 0;
-						for( final Integer i : hashSet ) {
-							sum += i;
-						}
-						return sum;
+						return summarize( hashSet );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
 	@Test
 	public void troveThashSetIteratorIsScalarized() throws Exception {
-		final Collection<Integer> thashSet = new THashSet<Integer>();
+		final Collection<Integer> thashSet = new THashSet<>();
 		for( int i = 0; i < SIZE; i++ ) {
 			thashSet.add( i );
 		}
@@ -90,14 +78,10 @@ public class IterateCollectionTest {
 
 					@Override
 					public long run() {
-						long sum = 0;
-						for( final Integer i : thashSet ) {
-							sum += i;
-						}
-						return sum;
+						return summarize( thashSet );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -112,15 +96,19 @@ public class IterateCollectionTest {
 				new Scenario() {
 					@Override
 					public long run() {
-						long sum = 0;
-						for( final Integer i : list ) {
-							sum += i;
-						}
-						return sum;
+						return summarize( list );
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
+	}
+
+	private static long summarize( final Iterable<Integer> list ) {
+		long sum = 0;
+		for( final Integer i : list ) {
+			sum += i;
+		}
+		return sum;
 	}
 
 }

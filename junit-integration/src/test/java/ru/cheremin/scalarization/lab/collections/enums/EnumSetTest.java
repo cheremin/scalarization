@@ -13,7 +13,7 @@ import ru.cheremin.scalarization.lab.collections.enums.SampleEnums.Enum16;
 import ru.cheremin.scalarization.lab.collections.enums.SampleEnums.Enum3;
 
 import static org.junit.Assert.assertThat;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesNothing;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesNothing;
 
 /**
  * @author ruslan
@@ -45,7 +45,7 @@ public class EnumSetTest {
 						}
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -64,7 +64,7 @@ public class EnumSetTest {
 						}
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -83,7 +83,7 @@ public class EnumSetTest {
 						}
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -104,7 +104,7 @@ public class EnumSetTest {
 						}
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 
 	}
@@ -124,7 +124,7 @@ public class EnumSetTest {
 						return sum;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 }

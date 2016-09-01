@@ -38,7 +38,7 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * defaults: 2000 instead of 1000 in 1.7. With InlineSmallCode=1000 1.8 jvm shows same
  * behavior as 1.7
  * <p/>
- * But for HashSet/THashSet lab are even more mysterious: even though PrintInlining
+ * But for HashSet/THashSet scenario are even more mysterious: even though PrintInlining
  * shows everything is inlined successfully, scalarization still not happens for some
  * sizes, like 4..32. Surprisingly, sizes 64-65 sometimes are scalarized. This is truly
  * mystery! TODO RC: to investigate
@@ -55,7 +55,7 @@ import static ru.cheremin.scalarization.ScenarioRun.crossJoin;
  * but such an iterator is not simpler than AbstractList's one...
  * <p/>
  * With 1.7.0_80/1.8.0_77 some JIT magic removes .next() from method profile entirely
- * for [size=0] -- I suspect something like DCE or advanced frequent/unfrequent path
+ * for [size=0] -- I suspect something like DCE or advanced frequent/infrequent path
  * extraction is applied before EA. Without this offender method EA/SA is succeeded
  * with grace
  * <p/>

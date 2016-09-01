@@ -8,8 +8,8 @@ import ru.cheremin.scalarization.lab.tricky.ObjectyStaffScenario.WithCustomHashC
 import ru.cheremin.scalarization.lab.tricky.ObjectyStaffScenario.WithoutCustomHashCode;
 
 import static org.junit.Assert.assertThat;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesNothing;
-import static ru.cheremin.scalarization.junit.AllocationMatcher.allocatesSomething;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesNothing;
+import static ru.cheremin.scalarization.junit.AllocationMatcher.finallyAllocatesSomething;
 
 /**
  * @author ruslan
@@ -26,7 +26,7 @@ public class ObjectyStaffTest {
 						return new Object().hashCode();
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 
 	}
@@ -44,7 +44,7 @@ public class ObjectyStaffTest {
 						return o.hashCode();
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 
 	}
@@ -60,7 +60,7 @@ public class ObjectyStaffTest {
 						return o1.equals( o2 ) ? 1 : 0;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -77,7 +77,7 @@ public class ObjectyStaffTest {
 						return o.hashCode();
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -94,7 +94,7 @@ public class ObjectyStaffTest {
 						return System.identityHashCode( o );
 					}
 				},
-				allocatesSomething()
+				finallyAllocatesSomething()
 		);
 	}
 
@@ -115,7 +115,7 @@ public class ObjectyStaffTest {
 						return o1.equals( o2 ) ? 1 : 8;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -136,7 +136,7 @@ public class ObjectyStaffTest {
 						return o1 == o2 ? 1 : 8;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -157,7 +157,7 @@ public class ObjectyStaffTest {
 						return o1.getClass() == o2.getClass() ? 1 : 5;
 					}
 				},
-				allocatesNothing()
+				finallyAllocatesNothing()
 		);
 	}
 
