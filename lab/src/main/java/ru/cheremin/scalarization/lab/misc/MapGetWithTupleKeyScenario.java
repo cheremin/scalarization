@@ -38,7 +38,13 @@ import static ru.cheremin.scalarization.lab.Utils.randomStringsPool;
  * do happen.
  * <p/>
  * With HashMap.get() keys are scalarized under 1.8 with default settings, and are not
- * scalarized under 1.7 with default settings, but are scalarized with InlineSmallCode=2000
+ * scalarized under 1.7 with default settings, but are scalarized with InlineSmallCode=2000.
+ * Scalarization is not stable, though. This is because of <a href="http://openjdk.java.net/jeps/180">JEP-180</a>:
+ * highly contended collision bins are reorganized as balanced trees instead of lists.
+ * Tree-bins are too complex for inlining, and prevents scalarization. Since number of
+ * collisions are subtle property of keys distribution, it is hard to predict do any
+ * bins converted to tree bins or not.
+ *
  * <p/>
  * Generally, both successful and unsuccessful lookups are scalarized/not scalarized.
  *
@@ -191,7 +197,7 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 
 		@Override
 		public int hashCode() {
-			return item1.hashCode() * 31 + item2.hashCode();
+			return item1.hashCode() * 17 + item2.hashCode();
 		}
 	}
 
@@ -269,7 +275,7 @@ public class MapGetWithTupleKeyScenario extends AllocationScenario {
 				allOf( SUCCESSFUL_LOOKUPS_PROBABILITY_KEY, 0.0, 0.5, 1.0 ),
 
 				asList(
-						new JvmExtendedProperty( "InlineSmallCode", "1000" ),
+//						new JvmExtendedProperty( "InlineSmallCode", "1000" ),
 						new JvmExtendedProperty( "InlineSmallCode", "2000" )
 				)
 		);
