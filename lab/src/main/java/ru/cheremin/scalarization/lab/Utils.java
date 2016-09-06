@@ -20,7 +20,8 @@ public class Utils {
 		return poolOf( strings );
 	}
 
-	public static <T> Pool<T> poolOf( final T[] items ) {
+	@SafeVarargs
+	public static <T> Pool<T> poolOf( final T... items ) {
 		return new Pool<>( items );
 	}
 

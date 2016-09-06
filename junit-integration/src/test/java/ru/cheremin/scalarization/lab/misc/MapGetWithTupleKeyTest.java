@@ -1,6 +1,7 @@
 package ru.cheremin.scalarization.lab.misc;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.common.collect.ImmutableMap;
@@ -97,6 +98,26 @@ public class MapGetWithTupleKeyTest {
 					public long run() {
 						final StringKey combinedKey = generateKey( SUCCESSFUL_LOOKUPS_PROBABILITY );
 						final String value = guavaMap.get( combinedKey );
+						if( value == null ) {
+							return combinedKey.item1.length();
+						} else {
+							return value.length();
+						}
+					}
+				},
+				finallyAllocatesNothing()
+		);
+	}
+
+	@Test
+	public void combinedKeyWithConcurrentHashMapIsScalarized() throws Exception {
+		final ConcurrentHashMap<StringKey, String> simplestMap = new ConcurrentHashMap<>( MAP );
+		assertThat(
+				new Scenario() {
+					@Override
+					public long run() {
+						final StringKey combinedKey = generateKey( SUCCESSFUL_LOOKUPS_PROBABILITY );
+						final String value = simplestMap.get( combinedKey );
 						if( value == null ) {
 							return combinedKey.item1.length();
 						} else {
