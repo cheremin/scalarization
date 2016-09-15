@@ -4,6 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Test;
 import ru.cheremin.scalarization.Scenario;
+import ru.cheremin.scalarization.lab.tricky.NewFinalizableScenario.OverridesFinalize;
 import ru.cheremin.scalarization.lab.tricky.ObjectyStaffScenario.WithCustomHashCode;
 import ru.cheremin.scalarization.lab.tricky.ObjectyStaffScenario.WithoutCustomHashCode;
 
@@ -50,17 +51,19 @@ public class ObjectyStaffTest {
 	}
 
 	@Test
-	public void objectEqualsIsScalarized() throws Exception {
+	public void systemIdentityHashCodeIsNOTScalarized() throws Exception {
 		assertThat(
 				new Scenario() {
 					@Override
 					public long run() {
-						final Object o1 = new Object();
-						final Object o2 = new Object();
-						return o1.equals( o2 ) ? 1 : 0;
+						final WithCustomHashCode o = new WithCustomHashCode(
+								nextLong(),
+								nextLong()
+						);
+						return System.identityHashCode( o );
 					}
 				},
-				finallyAllocatesNothing()
+				finallyAllocatesSomething()
 		);
 	}
 
@@ -82,19 +85,17 @@ public class ObjectyStaffTest {
 	}
 
 	@Test
-	public void systemIdentityHashCodeIsNOTScalarized() throws Exception {
+	public void objectEqualsIsScalarized() throws Exception {
 		assertThat(
 				new Scenario() {
 					@Override
 					public long run() {
-						final WithCustomHashCode o = new WithCustomHashCode(
-								nextLong(),
-								nextLong()
-						);
-						return System.identityHashCode( o );
+						final Object o1 = new Object();
+						final Object o2 = new Object();
+						return o1.equals( o2 ) ? 1 : 0;
 					}
 				},
-				finallyAllocatesSomething()
+				finallyAllocatesNothing()
 		);
 	}
 
@@ -150,14 +151,87 @@ public class ObjectyStaffTest {
 								nextLong(),
 								nextLong()
 						);
-						final WithoutCustomHashCode o2 = new WithoutCustomHashCode(
-								nextLong(),
-								nextLong()
-						);
-						return o1.getClass() == o2.getClass() ? 1 : 5;
+						return o1.getClass().hashCode();
 					}
 				},
 				finallyAllocatesNothing()
+		);
+	}
+
+	@Test
+	public void synchronizedIsScalarized() throws Exception {
+		assertThat(
+				new Scenario() {
+					@Override
+					public long run() {
+						final WithCustomHashCode o1 = new WithCustomHashCode(
+								nextLong(),
+								nextLong()
+						);
+						synchronized( o1 ) {
+							return o1.hashCode();
+						}
+					}
+				},
+				finallyAllocatesNothing()
+		);
+	}
+
+	@Test
+	public void waitIsNOTScalarized() throws Exception {
+		assertThat(
+				new Scenario() {
+					@Override
+					public long run() {
+						try {
+							final WithCustomHashCode o1 = new WithCustomHashCode(
+									nextLong(),
+									nextLong()
+							);
+							synchronized( o1 ) {
+								o1.wait( 1 );
+								return 2;
+							}
+						} catch( InterruptedException e ) {
+							return -1;
+						}
+					}
+				},
+				finallyAllocatesSomething()
+		);
+	}
+
+	@Test
+	public void notifyIsNOTScalarized() throws Exception {
+		assertThat(
+				new Scenario() {
+					@Override
+					public long run() {
+						final WithCustomHashCode o1 = new WithCustomHashCode(
+								nextLong(),
+								nextLong()
+						);
+						synchronized( o1 ) {
+							o1.notify();
+							return 2;
+						}
+					}
+				},
+				finallyAllocatesSomething()
+		);
+	}
+
+	@Test
+	public void objectWithFinalizerIsNOTScalarized() throws Exception {
+		assertThat(
+				new Scenario() {
+					@Override
+					public long run() {
+						final OverridesFinalize o = new OverridesFinalize( "a" );
+						return o.name.length();
+					}
+				},
+				finallyAllocatesSomething()
 		);
 	}
 
