@@ -61,9 +61,9 @@ public class ScenarioRunner {
 			final List<ScenarioRun> scenarioRuns = extractScenarioSpecificArgs( scenarioClass );
 
 			if( scenarioRuns.isEmpty() ) {
-				out.printf( "Running %s: x 1 run (@ScenarioRunArgs not found) \n", scenarioClass.getCanonicalName() );
+				out.printf( "Running %s: x once (no @ScenarioRunArgs) \n", scenarioClass.getCanonicalName() );
 			} else {
-				out.printf( "Running %s: x %d runs (@ScenarioRunArgs found) \n",
+				out.printf( "Running %s: x %d (@ScenarioRunArgs was found) \n",
 				            scenarioClass.getCanonicalName(),
 				            scenarioRuns.size()
 				);

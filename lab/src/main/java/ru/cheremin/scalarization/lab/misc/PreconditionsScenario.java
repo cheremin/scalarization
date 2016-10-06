@@ -1,7 +1,6 @@
 package ru.cheremin.scalarization.lab.misc;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 import ru.cheremin.scalarization.AllocationScenario;
 import ru.cheremin.scalarization.ScenarioRun;
@@ -35,13 +34,17 @@ public class PreconditionsScenario extends AllocationScenario {
 
 	private final Pool<String> pool = randomStringsPool( 1024 );
 
-	private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
+//	private final Class<?> hack;
+//
+//	public PreconditionsScenario() throws Exception {
+//		hack = Class.forName( "java.util.AbstractList$1" );
+//	}
 
 	@Override
 	public long run() {
 		try {
 			switch( SIZE ) {
-				//no reason to check 0-args since there is checkArgument 0-args version
+				//no reason to check 0-args since there is 0-arg checkArgument() version
 				case 1: {
 					checkArgument1Arg();
 					return 0;
@@ -102,18 +105,24 @@ public class PreconditionsScenario extends AllocationScenario {
 		return "failed probability: " + CHECK_FAILED_PROBABILITY;
 	}
 
+
+	private long counter = 1;
+
+
 	private boolean falseWithProbability( final double falseProbability ) {
-		//RC: 'false' must be possible (so JIT can't prove it impossible and DCE code
-		// altogether), but it should be very unlikely, since I don't want exception
-		// to be really thrown
-		return rnd.nextDouble() >= falseProbability;
+		final long ratio = Math.round( 1 / falseProbability );
+
+		return ( counter++ % ratio ) != 0;
+
+//		final ThreadLocalRandom rnd = ThreadLocalRandom.current();
+//		return rnd.nextDouble() >= falseProbability;
 	}
 
 	@ScenarioRunArgs
 	public static List<ScenarioRun> parametersToRunWith() {
 		return crossJoin(
-				allOf( CHECK_FAILED_PROBABILITY_KEY, "1e-7", "1e-9", "1e-11" ),
-				allOf( SIZE_KEY, 1, 2, 3, 4 )
+				allOf( CHECK_FAILED_PROBABILITY_KEY, "1e-7", "1e-8", "1e-9", "1e-10", "1e-11" ),
+				allOf( SIZE_KEY, 1/*, 2, 3, 4*/ )
 		);
 	}
 }
