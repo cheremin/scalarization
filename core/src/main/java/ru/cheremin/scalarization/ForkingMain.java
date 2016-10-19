@@ -63,7 +63,7 @@ new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", false ) )
 
 			final List<Class<? extends Scenario>> allocationScenarioClasses = lookupScenarios( AUTODISCOVER_ALL_SCENARIOS_IN );
 			//TODO RC: print ScenarioRuns count right after class names here
-			System.out.printf( "Found lab: \n" + Joiner.on( "\n" ).join( allocationScenarioClasses ) + " \n\n" );
+			System.out.printf( "Found scenario: \n" + Joiner.on( "\n" ).join( allocationScenarioClasses ) + " \n\n" );
 
 			for( final Class<? extends Scenario> allocationScenarioClass : allocationScenarioClasses ) {
 				if( !Modifier.isAbstract( allocationScenarioClass.getModifiers() ) ) {
