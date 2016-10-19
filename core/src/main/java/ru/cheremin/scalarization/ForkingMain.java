@@ -105,10 +105,15 @@ new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", false ) )
 		scenarioRunner.run();
 	}
 
+	@SuppressWarnings( "unchecked" )
 	private static List<Class<? extends Scenario>> lookupScenarios( final String autodiscoverAllScenariosIn ) {
 		final Reflections reflections = new Reflections( autodiscoverAllScenariosIn );
-		final List<Class<? extends Scenario>> allocationScenarioClasses =
-				Lists.newArrayList( reflections.getSubTypesOf( Scenario.class ) );
+
+		//TODO RC: lookup AllocationScenario instead of plain Scenario because it seems
+		//         Reflections lookup don't account for deep inheritance. Dirty fixed now
+		final List<Class<? extends AllocationScenario>> allocationScenarioClasses =
+				Lists.newArrayList( reflections.getSubTypesOf( AllocationScenario.class ) );
+
 		//sort just to have stable order
 		Collections.sort( allocationScenarioClasses, new Ordering<Class<? extends Scenario>>() {
 			@Override
@@ -117,6 +122,6 @@ new ScenarioRun( new JvmExtendedFlag( "EliminateAllocations", false ) )
 				return left.getCanonicalName().compareTo( right.getCanonicalName() );
 			}
 		} );
-		return allocationScenarioClasses;
+		return (List)allocationScenarioClasses;
 	}
 }
