@@ -7,9 +7,15 @@ in JVM. It contains set of scenarios and a small framework to run them.
 ```
 mvn clean package
 ```
+There are 3 modules right now: `core` contains infrastructure (execution framework),
+`lab` contains actual scenarios, `junit-integration` is experimental, it contains
+draft of allocation scenarios run with junit/hamcrest
+
 
 ## How to run ##
 (Assuming you have `$JAVA_HOME` pointing to java installation you want to test)
+
+Go to `lab` module, and run:
 
 ```
 chmod u+x scripts/run-all.sh
